@@ -3,7 +3,7 @@
 > [!IMPORTANT]
 > This application is currently in the active development process. We value your ideas! Please contribute by opening **Issues** or submitting **Pull Requests**. For our future plans, check out our [roadmap](ROADMAP.md).
 
-Teenvana is a modern messenger application tailored for teens and young adults, focusing on speed, simplicity, and expressive communication.
+Teenvana is a  messenger application tailored for teens and young adults, focusing on speed, simplicity.
 
 ## ✨ Features
 
