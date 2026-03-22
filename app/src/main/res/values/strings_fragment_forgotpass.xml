@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Navigation buttons for Reset Password flow -->
+    <string name="reset_button_back">Back</string>
+    <string name="reset_button_next">Next</string>
+    <string name="reset_button_finish">Finish</string>
+
+    <!-- Step 1: Account identification (Phone or Email) -->
+    <string name="reset_step1_header">Reset Password</string>
+    <string name="reset_step1_subheader">Find your account</string>
+    <string name="reset_step1_hint_prompt">Phone number or Email</string>
+    <string name="reset_step1_description">Enter your details and we will send a verification code to your phone</string>
+
+    <!-- Step 2: Verification code entry -->
+    <string name="reset_step2_header">Verification</string>
+    <string name="reset_step2_subheader">Check your messages</string>
+    <string name="reset_step2_hint_prompt">Verification code</string>
+    <string name="reset_step2_description">Please enter the 6-digit code sent to your device</string>
+
+    <!-- Step 3: Creating new password -->
+    <string name="reset_step3_header">New Password</string>
+    <string name="reset_step3_subheader">Create a strong password</string>
+    <string name="reset_step3_hint_prompt_password">New password</string>
+    <string name="reset_step3_hint_prompt_confirm_password">Confirm new password</string>
+
+    <!-- Step 4: Success message -->
+    <string name="reset_step4_hooray_header">Success!</string>
+    <string name="reset_step4_success_subheader">Your password has been successfully updated!</string>
+</resources>

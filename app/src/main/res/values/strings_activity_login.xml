@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Login screen header -->
+    <string name="login_header">Sign in</string>
+
+    <!-- Sign-in form hints (Username/Email and Password) -->
+    <string name="login_prompt_hint">Username or email</string>
+    <string name="pass_prompt_hint">Password</string>
+
+    <!-- Form options -->
+    <string name="login_checkbox_remember_me">Remember me</string>
+
+    <!-- Main action button -->
+    <string name="login_button_submit">Login</string>
+
+    <!-- Navigation links to other screens -->
+    <string name="login_button_link_register">Register</string>
+    <string name="login_button_link_forgot_password">Forgot password?</string>
+</resources>

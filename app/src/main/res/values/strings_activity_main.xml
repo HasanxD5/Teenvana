@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bottom_menu_item_chats">Chats</string>
+    <string name="bottom_menu_item_contacts">Contacts</string>
+    <string name="bottom_menu_item_profile">Profile</string>
+    <string name="bottom_menu_item_settings">Settings</string>
+</resources>

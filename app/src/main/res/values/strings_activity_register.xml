@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Navigation buttons for the registration flow -->
+    <string name="register_button_back">Back</string>
+    <string name="register_button_next">Next</string>
+
+    <!-- Step 1: Phone number entry -->
+    <string name="register_step1_header">Phone number</string>
+    <string name="register_step1_subheader">Register your phone number</string>
+    <string name="register_step1_hint_prompt">Enter your phone number</string>
+    <string name="register_step1_description">A verification code will be sent to your phone number which you need to enter</string>
+
+    <!-- Step 2: SMS verification code -->
+    <string name="register_step2_header">SMS Verification</string>
+    <string name="register_step2_subheader">Confirm your phone number</string>
+    <string name="register_step2_hint_prompt">SMS code</string>
+
+    <!-- Step 3: User profile information -->
+    <string name="register_step3_header">Who are you</string>
+    <string name="register_step3_subheader">Fill in basic information about yourself</string>
+    <string name="register_step3_hint_prompt_firstname">First name</string>
+    <string name="register_step3_hint_prompt_lastname">Last name</string>
+    <string name="register_step3_hint_prompt_date_of_birth">Date of birth</string>
+    <string name="register_step3_hint_prompt_email">Email</string>
+    <string name="register_step3_hint_prompt_login">Login</string>
+
+    <!-- Step 4: Security and password setup -->
+    <string name="register_step4_header">Secure password</string>
+    <string name="register_step4_subheader">Secure your account to keep your messages private</string>
+    <string name="register_step4_hint_prompt_password">Password</string>
+    <string name="register_step4_hint_prompt_confirm_password">Confirm password</string>
+
+    <!-- Step 5: Final success screen -->
+    <string name="register_step5_hooray_header">Hooray!</string>
+    <string name="register_step5_success_subheader">You have successfully registered!</string>
+</resources>
