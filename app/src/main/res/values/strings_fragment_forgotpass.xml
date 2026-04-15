@@ -9,7 +9,7 @@
     <string name="reset_step1_header">Reset Password</string>
     <string name="reset_step1_subheader">Find your account</string>
     <string name="reset_step1_hint_prompt">Phone number or Email</string>
-    <string name="reset_step1_description">Enter your details and we will send a verification code to your phone</string>
+    <string name="reset_step1_description">Enter your details, and we will send a verification code to your phone</string>
 
     <!-- Step 2: Verification code entry -->
     <string name="reset_step2_header">Verification</string>

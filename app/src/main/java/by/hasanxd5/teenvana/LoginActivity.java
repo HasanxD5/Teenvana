@@ -51,7 +51,8 @@ public class LoginActivity extends AppCompatActivity {
 
         // English comment: Handle "Forgot Password" click
         linkForgotPassword.setOnClickListener(v -> {
-            Toast.makeText(this, "Forgot password screen is not implemented yet", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(LoginActivity.this, ResetPasswordActivity.class);
+            startActivity(intent);
         });
 
         buttonSubmit.setOnClickListener(v -> {
