@@ -17,7 +17,7 @@ import by.hasanxd5.teenvana.register.RegisterActivity;
 public class LoginActivity extends AppCompatActivity {
 
     private Button buttonSubmit;
-    private TextView linkSignUp, linkForgotPassword;
+    private TextView loginPrompt, passwordPrompt, linkSignUp, linkForgotPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +37,8 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void initViews() {
+        loginPrompt = findViewById(R.id.loginPrompt);
+        passwordPrompt = findViewById(R.id.passwordPrompt);
         buttonSubmit = findViewById(R.id.buttonSubmit);
         linkSignUp = findViewById(R.id.textViewSignUp);
         linkForgotPassword = findViewById(R.id.textViewForgotPassword);
@@ -56,7 +58,21 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         buttonSubmit.setOnClickListener(v -> {
-            // Your validation logic here
+
+            String login = loginPrompt.getText().toString().trim();
+            String password = passwordPrompt.getText().toString().trim();
+
+            if (login.equals("admin") && password.equals("admin")) {
+                Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+            else if (login.isEmpty() || password.isEmpty()) {
+                Toast.makeText(LoginActivity.this, "Please enter login and password", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(LoginActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
+            }
+
         });
     }
 }

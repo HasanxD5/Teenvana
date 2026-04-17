@@ -4,6 +4,13 @@
     <string name="app_name">Teenvana</string>
     <string name="app_version">Alpha 0.1</string>
 
+    <!-- Main Screens Content -->
+    <string name="chats_list_placeholder">Your conversations will appear here</string>
+    <string name="contacts_list_placeholder">Your contacts will appear here</string>
+    <string name="settings_content_placeholder">App settings and profile</string>
+    <string name="description_new_chat">New Chat</string>
+    <string name="description_add_contact">Add Contact</string>
+
     <!-- Common button actions -->
     <string name="button_ok">OK</string>
     <string name="button_cancel">Cancel</string>

@@ -27,7 +27,6 @@ public class RegisterPhoneFragments {
             TextView phonePrompt = view.findViewById(R.id.phonePromptReg);
             view.findViewById(R.id.buttonNextReg).setOnClickListener(v -> {
                 if (phonePrompt != null) {
-                    // Получаем текст именно в момент клика!
                     String phoneStr = phonePrompt.getText().toString().trim();
 
                     if (phoneStr.isEmpty()) {
