@@ -31,6 +31,4 @@ Teenvana is a  messenger application tailored for teens and young adults, focusi
 4.  **Build & Run:** Ensure you have an emulator or device running **Android 12 (API 31) or newer**.
 
 ## 📸 Screenshots
-![Login activity](docs/screenshots/screenshot_registration.png)
-![Registration activity](docs/screenshots/screenshot_registration.png)
-![Home activity](docs/screenshots/screenshot_home.png)
+None any screens to show yet!
