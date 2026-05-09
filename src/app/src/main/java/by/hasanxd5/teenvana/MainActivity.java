@@ -1,8 +1,12 @@
 package by.hasanxd5.teenvana;
 
 import android.os.Bundle;
+import android.view.Window;
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.NavigationUI;
@@ -16,6 +20,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
+        Window window = getWindow();
+        int darkColor = ContextCompat.getColor(this, android.R.color.black);
+        window.setStatusBarColor(darkColor);
+        window.setNavigationBarColor(darkColor);
+
+        WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(window, window.getDecorView());
+        controller.setAppearanceLightStatusBars(false); // false = белые иконки
+        controller.setAppearanceLightNavigationBars(false); // false = белые иконки
 
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment_main);

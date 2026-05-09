@@ -20,7 +20,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Objects;
 
-import by.hasanxd5.teenvana.LoginActivity;
+import by.hasanxd5.teenvana.login.LoginActivity;
 import by.hasanxd5.teenvana.R;
 
 public class RegisterUsersFragments {

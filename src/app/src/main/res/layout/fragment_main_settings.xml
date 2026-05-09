@@ -16,7 +16,7 @@
         android:paddingBottom="8dp"
         android:text="@string/bottom_menu_item_settings"
         android:textColor="?attr/colorOnSurface"
-        android:textSize="28sp"
+        android:textSize="24sp"
         android:textStyle="bold" />
 
     <androidx.core.widget.NestedScrollView

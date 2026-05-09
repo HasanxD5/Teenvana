@@ -1,11 +1,15 @@
 package by.hasanxd5.teenvana.register;
 
 import android.os.Bundle;
+import android.view.Window;
+
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import by.hasanxd5.teenvana.R;
 
@@ -16,6 +20,15 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_register);
+
+        Window window = getWindow();
+        int darkColor = ContextCompat.getColor(this, android.R.color.black);
+        window.setStatusBarColor(darkColor);
+        window.setNavigationBarColor(darkColor);
+
+        WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(window, window.getDecorView());
+        controller.setAppearanceLightStatusBars(false); // false = белые иконки
+        controller.setAppearanceLightNavigationBars(false); // false = белые иконки
 
         // Standard Edge-to-Edge padding setup
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.register), (v, insets) -> {

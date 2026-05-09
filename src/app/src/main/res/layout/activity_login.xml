@@ -13,35 +13,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        tools:context=".LoginActivity">
+        tools:context=".login.LoginActivity">
 
         <!-- Заголовок: убрал фиксированные 200dp, сделал адаптивное положение -->
 
         <!-- Ссылки внизу: прижаты к нижней части экрана -->
 
-        <TextView
-            android:id="@+id/loginHeader"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="140dp"
-            android:layout_marginBottom="24dp"
-            android:text="@string/login_header"
-            android:textSize="34sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@+id/loginForm"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <LinearLayout
             android:id="@+id/loginForm"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
             android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@+id/layoutLinks"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/loginHeader"
+            app:layout_constraintVertical_bias="0.5"
             app:layout_constraintWidth_max="440dp"
             app:layout_constraintWidth_percent="0.85">
 
@@ -105,16 +92,32 @@
 
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/loginHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="200dp"
+            android:layout_marginBottom="24dp"
+            android:text="@string/login_header"
+            android:textSize="34sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@+id/loginForm"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <LinearLayout
             android:id="@+id/layoutLinks"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
+            android:layout_marginTop="100dp"
             android:orientation="horizontal"
             app:layout_constraintBottom_toTopOf="@+id/appVersion"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintVertical_bias="1.0">
+            app:layout_constraintTop_toBottomOf="@+id/loginForm">
 
             <TextView
                 android:id="@+id/textViewSignUp"
@@ -158,13 +161,14 @@
             android:id="@+id/appVersion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="100dp"
             android:text="@string/app_version"
             android:textColor="#757575"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/layoutLinks" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

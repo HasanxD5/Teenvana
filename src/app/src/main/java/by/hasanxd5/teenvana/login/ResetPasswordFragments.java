@@ -1,4 +1,4 @@
-package by.hasanxd5.teenvana;
+package by.hasanxd5.teenvana.login;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -17,6 +17,8 @@ import androidx.appcompat.app.AlertDialog;
 import android.widget.FrameLayout;
 import android.view.Gravity;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
+
+import by.hasanxd5.teenvana.R;
 
 public class ResetPasswordFragments {
 
