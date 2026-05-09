@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_search"
+        android:icon="@android:drawable/ic_menu_search"
+        android:title="Search"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/menu_mute_group"
+        android:icon="@android:drawable/ic_lock_silent_mode"
+        android:title="Mute Notifications">
+        <menu>
+            <item
+                android:id="@+id/action_mute_1h"
+                android:title="Mute for 1 hour" />
+            <item
+                android:id="@+id/action_mute_8h"
+                android:title="Mute for 8 hours" />
+            <item
+                android:id="@+id/action_mute_2d"
+                android:title="Mute for 2 days" />
+            <item
+                android:id="@+id/action_mute_forever"
+                android:title="Mute forever" />
+            <item
+                android:id="@+id/action_unmute"
+                android:title="Unmute" />
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/action_clear_history"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:title="Clear History"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_delete_chat"
+        android:icon="@android:drawable/ic_delete"
+        android:title="Delete Chat"
+        app:showAsAction="never" />
+
+</menu>

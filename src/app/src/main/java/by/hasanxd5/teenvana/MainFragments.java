@@ -1,15 +1,24 @@
 package by.hasanxd5.teenvana;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import androidx.recyclerview.widget.RecyclerView;
+import by.hasanxd5.teenvana.chat.ChatAdapter;
+import by.hasanxd5.teenvana.chat.ChatDetailActivity;
+import by.hasanxd5.teenvana.models.Chat;
+import by.hasanxd5.teenvana.models.Message;
+import by.hasanxd5.teenvana.models.User;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainFragments {
 
@@ -23,6 +32,25 @@ public class MainFragments {
             // Inflate the layout for this fragment
             View view = inflater.inflate(R.layout.fragment_main_chats, container, false);
             applySystemInsets(view);
+
+            RecyclerView recyclerView = view.findViewById(R.id.recyclerViewChats);
+            List<Chat> chats = new ArrayList<>();
+            // Mock some chats
+            User user1 = new User("1", "John Doe", null);
+            Message lastMsg1 = new Message("1", "1", "Hello there!", System.currentTimeMillis());
+            chats.add(new Chat("1", user1, lastMsg1, 2));
+
+            User user2 = new User("2", "Jane Smith", null);
+            Message lastMsg2 = new Message("2", "me", "See you tomorrow", System.currentTimeMillis());
+            chats.add(new Chat("2", user2, lastMsg2, 0));
+
+            ChatAdapter adapter = new ChatAdapter(chats, chat -> {
+                Intent intent = new Intent(getActivity(), ChatDetailActivity.class);
+                intent.putExtra("chat", chat);
+                startActivity(intent);
+            });
+            recyclerView.setAdapter(adapter);
+
             return view;
         }
     }
