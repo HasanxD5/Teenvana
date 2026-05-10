@@ -51,4 +51,10 @@
     <style name="CircleImage" parent="">
         <item name="cornerSize">50%</item>
     </style>
+
+    <style name="Theme.MediaViewer" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
 </resources>

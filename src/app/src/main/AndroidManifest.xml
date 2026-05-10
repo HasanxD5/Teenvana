@@ -18,8 +18,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".chat.MediaViewerActivity"
-            android:screenOrientation="sensor"
-            android:theme="@style/Theme.AppCompat.NoActionBar" />
+            android:theme="@style/Theme.MediaViewer" />
         <activity
             android:name=".chat.ChatDetailActivity"
             android:exported="false" />
