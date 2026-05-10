@@ -22,12 +22,14 @@
         android:layout_height="match_parent"
         android:visibility="gone" />
 
-    <VideoView
-        android:id="@+id/full_video_view"
+    <androidx.media3.ui.PlayerView
+        android:id="@+id/player_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:visibility="gone" />
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:use_controller="true"
+        app:show_timeout="3000"
+        app:surface_type="surface_view" />
 
     <ProgressBar
         android:id="@+id/loading_progress"
