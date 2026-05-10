@@ -37,11 +37,11 @@ public class MainFragments {
             List<Chat> chats = new ArrayList<>();
             // Mock some chats
             User user1 = new User("1", "John Doe", null);
-            Message lastMsg1 = new Message("1", "1", "Hello there!", System.currentTimeMillis());
+            Message lastMsg1 = new Message("1", "1", "Hello there!", System.currentTimeMillis(), "TEXT", null);
             chats.add(new Chat("1", user1, lastMsg1, 2));
 
             User user2 = new User("2", "Jane Smith", null);
-            Message lastMsg2 = new Message("2", "me", "See you tomorrow", System.currentTimeMillis());
+            Message lastMsg2 = new Message("2", "me", "See you tommorow", System.currentTimeMillis(), "TEXT", null);
             chats.add(new Chat("2", user2, lastMsg2, 0));
 
             ChatAdapter adapter = new ChatAdapter(chats, chat -> {

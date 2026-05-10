@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <ImageView
+        android:id="@+id/full_image_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitCenter"
+        android:visibility="gone" />
+
+    <VideoView
+        android:id="@+id/full_video_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+    <ImageButton
+        android:id="@+id/play_button"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_centerInParent="true"
+        android:background="@android:color/transparent"
+        android:scaleType="fitXY"
+        android:src="@android:drawable/ic_media_play"
+        android:visibility="gone"
+        app:tint="#FFFFFF" />
+
+    <ImageButton
+        android:id="@+id/btn_back"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="40dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:rotation="0"
+        android:src="@android:drawable/ic_menu_revert"
+        app:tint="#FFFFFF"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+</RelativeLayout>

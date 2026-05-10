@@ -3,6 +3,8 @@ package by.hasanxd5.teenvana.chat;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -11,7 +13,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.tabs.TabLayout;
+
 import by.hasanxd5.teenvana.R;
 import by.hasanxd5.teenvana.models.Chat;
 import by.hasanxd5.teenvana.models.Message;
@@ -24,11 +32,21 @@ public class ChatDetailActivity extends AppCompatActivity {
     private MessageAdapter adapter;
     private RecyclerView recyclerView;
     private EditText editTextMessage;
+    private MediaHelper mediaHelper;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_detail);
+
+        Window window = getWindow();
+        int darkColor = ContextCompat.getColor(this, android.R.color.black);
+        window.setStatusBarColor(darkColor);
+        window.setNavigationBarColor(darkColor);
+
+        WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(window, window.getDecorView());
+        controller.setAppearanceLightStatusBars(false); // false = белые иконки
+        controller.setAppearanceLightNavigationBars(false); // false = белые иконки
 
         Chat chat = (Chat) getIntent().getSerializableExtra("chat");
 
@@ -49,21 +67,19 @@ public class ChatDetailActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerViewMessages);
         editTextMessage = findViewById(R.id.editTextMessage);
-        ImageButton buttonEmoji = findViewById(R.id.buttonEmoji);
-        ImageButton buttonAttach = findViewById(R.id.buttonAttach);
         ImageButton buttonSend = findViewById(R.id.buttonSend);
 
         messages = new ArrayList<>();
         // Mock some messages
-        messages.add(new Message("1", "other", "Hello!", System.currentTimeMillis()));
-        messages.add(new Message("2", "me", "Hi there!", System.currentTimeMillis()));
+        messages.add(new Message("1", "other", "Hello!", System.currentTimeMillis(), "TEXT", null));
+        messages.add(new Message("2", "me", "Hi there!", System.currentTimeMillis(), "TEXT", null));
 
         adapter = new MessageAdapter(messages, "me");
         recyclerView.setAdapter(adapter);
 
         buttonSend.setOnClickListener(v -> sendMessage());
-        buttonEmoji.setOnClickListener(v -> Toast.makeText(this, "Emoji picker opened", Toast.LENGTH_SHORT).show());
-        buttonAttach.setOnClickListener(v -> Toast.makeText(this, "Attachment picker opened", Toast.LENGTH_SHORT).show());
+        mediaHelper = new MediaHelper(getContentResolver());
+        findViewById(R.id.buttonAttach).setOnClickListener(v -> showMediaPicker());
     }
 
     @Override
@@ -103,14 +119,76 @@ public class ChatDetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void showMediaPicker() {
+
+        // --- Request permissions ---
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.READ_MEDIA_IMAGES) != android.content.pm.PackageManager.PERMISSION_GRANTED ||
+                    checkSelfPermission(android.Manifest.permission.READ_MEDIA_VIDEO) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+
+                requestPermissions(new String[]{
+                        android.Manifest.permission.READ_MEDIA_IMAGES,
+                        android.Manifest.permission.READ_MEDIA_VIDEO
+                }, 100);
+                return; // Прерываем метод, пока пользователь не даст разрешение
+            }
+        } else {
+            // Check for Android 12
+            if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
+                return;
+            }
+        }
+
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        View view = getLayoutInflater().inflate(R.layout.dialog_media_picker, findViewById(android.R.id.content), false);
+
+        TabLayout tabs = view.findViewById(R.id.mediaTabLayout);
+        RecyclerView rv = view.findViewById(R.id.mediaRecyclerView);
+        rv.setLayoutManager(new androidx.recyclerview.widget.GridLayoutManager(this, 3));
+
+        tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                // Теперь у нас только 0 (Фото) и 1 (Видео)
+                String selectedType = (tab.getPosition() == 1)
+                        ? MediaHelper.TYPE_VIDEO
+                        : MediaHelper.TYPE_IMAGE;
+
+                updateList(rv, selectedType, dialog);
+            }
+            @Override public void onTabUnselected(TabLayout.Tab t) {}
+            @Override public void onTabReselected(TabLayout.Tab t) {}
+        });
+
+        updateList(rv, MediaHelper.TYPE_IMAGE, dialog);
+        dialog.setContentView(view);
+        dialog.show();
+    }
+
+    private void updateList(RecyclerView rv, String type, BottomSheetDialog dialog) {
+        List<String> data = mediaHelper.fetchMedia(type);
+
+        if (data.isEmpty()) {
+            android.util.Log.d("CHAT_DEBUG", "No files found for type: " + type);
+        }
+
+        rv.setAdapter(new MediaPickerAdapter(data, path -> {
+            sendMediaMessage(path, type);
+            dialog.dismiss();
+        }));
+    }
+
     private void sendMessage() {
         String text = editTextMessage.getText().toString().trim();
         if (!text.isEmpty()) {
             Message newMessage = new Message(
                     "" + System.currentTimeMillis(),
                     "me",
-                    text,
-                    System.currentTimeMillis()
+                    text, // переменная с текстом сообщения
+                    System.currentTimeMillis(),
+                    "TEXT",
+                    null
             );
             messages.add(newMessage);
             adapter.notifyItemInserted(messages.size() - 1);
@@ -118,4 +196,35 @@ public class ChatDetailActivity extends AppCompatActivity {
             editTextMessage.setText("");
         }
     }
+
+    private void sendMediaMessage(String filePath, String type) {
+        // 1. Create a unique ID for the message (usually based on timestamp)
+        String messageId = String.valueOf(System.currentTimeMillis());
+
+        // 2. Get the current timestamp
+        long currentTime = System.currentTimeMillis();
+
+        // 3. Create the Message object
+        // Assuming your Message constructor is: Message(id, senderId, text, timestamp, type, mediaUrl)
+        Message mediaMessage = new Message(
+                messageId,
+                "me",           // Current user ID
+                null,           // No text for media messages
+                currentTime,
+                type,           // "IMAGE", "VIDEO", or "GIF"
+                filePath        // Local path to the file
+        );
+
+        // 4. Add to your local list
+        messages.add(mediaMessage);
+
+        // 5. Notify the adapter that a new item is inserted
+        adapter.notifyItemInserted(messages.size() - 1);
+
+        // 6. Scroll to the bottom to show the new message
+        recyclerView.scrollToPosition(messages.size() - 1);
+
+        // TODO: Later you will add Firebase Storage upload logic here
+    }
+
 }

@@ -3,9 +3,13 @@ package by.hasanxd5.teenvana.chat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+
 import by.hasanxd5.teenvana.R;
 import by.hasanxd5.teenvana.models.Message;
 import java.text.SimpleDateFormat;
@@ -58,6 +62,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         } else {
             ((ReceivedMessageViewHolder) holder).bind(message);
         }
+
     }
 
     @Override
@@ -73,32 +78,83 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     static class SentMessageViewHolder extends RecyclerView.ViewHolder {
         private final TextView textViewMessage;
         private final TextView textViewTime;
+        private final ImageView messageImageView; // 1. Объявляем поле
 
         public SentMessageViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewMessage = itemView.findViewById(R.id.textViewMessage);
             textViewTime = itemView.findViewById(R.id.textViewTime);
+            // 2. Связываем с XML
+            messageImageView = itemView.findViewById(R.id.messageImageView);
         }
 
         public void bind(Message message) {
-            textViewMessage.setText(message.getText());
+            String type = message.getType();
+
+            // 1. Логика отображения: только IMAGE и VIDEO
+            if ("IMAGE".equals(type) || "VIDEO".equals(type)) {
+                messageImageView.setVisibility(View.VISIBLE);
+                textViewMessage.setVisibility(View.GONE);
+
+                Glide.with(itemView.getContext())
+                        .load(message.getUrl())
+                        .placeholder(R.drawable.loading_placeholder)
+                        .error(R.drawable.error_image)
+                        .centerCrop()
+                        .into(messageImageView);
+            } else {
+                // Если это обычный текст
+                messageImageView.setVisibility(View.GONE);
+                textViewMessage.setVisibility(View.VISIBLE);
+                textViewMessage.setText(message.getText());
+            }
+
+            // Установка времени
             textViewTime.setText(formatTimestamp(message.getTimestamp()));
+
+            // 2. Обработка клика: открываем просмотрщик только для фото и видео
+            itemView.setOnClickListener(v -> {
+                if ("IMAGE".equals(type) || "VIDEO".equals(type)) {
+                    android.content.Intent intent = new android.content.Intent(v.getContext(), MediaViewerActivity.class);
+                    intent.putExtra("MEDIA_PATH", message.getUrl());
+                    intent.putExtra("MEDIA_TYPE", type);
+                    v.getContext().startActivity(intent);
+                }
+            });
         }
     }
 
     static class ReceivedMessageViewHolder extends RecyclerView.ViewHolder {
         private final TextView textViewMessage;
         private final TextView textViewTime;
+        private final ImageView messageImageView; // 1. Объявляем поле
 
         public ReceivedMessageViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewMessage = itemView.findViewById(R.id.textViewMessage);
             textViewTime = itemView.findViewById(R.id.textViewTime);
+            // 2. Связываем с XML
+            messageImageView = itemView.findViewById(R.id.messageImageView);
         }
 
         public void bind(Message message) {
-            textViewMessage.setText(message.getText());
+            if ("IMAGE".equals(message.getType()) || "GIF".equals(message.getType())) {
+                messageImageView.setVisibility(View.VISIBLE);
+                textViewMessage.setVisibility(View.GONE);
+
+                Glide.with(itemView.getContext())
+                        .load(message.getUrl())
+                        .placeholder(R.drawable.loading_placeholder)
+                        .error(R.drawable.error_image)
+                        .centerCrop()
+                        .into(messageImageView);
+            } else {
+                messageImageView.setVisibility(View.GONE);
+                textViewMessage.setVisibility(View.VISIBLE);
+                textViewMessage.setText(message.getText());
+            }
             textViewTime.setText(formatTimestamp(message.getTimestamp()));
         }
     }
+
 }
