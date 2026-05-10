@@ -52,7 +52,7 @@
         <item name="cornerSize">50%</item>
     </style>
 
-    <style name="Theme.MediaViewer" parent="Theme.AppCompat.NoActionBar">
+    <style name="Theme.MediaViewer" parent="Theme.Material3.Dark.NoActionBar">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>

@@ -1,20 +1,20 @@
 package by.hasanxd5.teenvana.chat;
 
-import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.OptIn;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.PopupMenu;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.Player;
 import androidx.media3.common.util.UnstableApi;
@@ -27,8 +27,9 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.github.chrisbanes.photoview.PhotoView;
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import java.util.Objects;
 import by.hasanxd5.teenvana.R;
 
 public class MediaViewerActivity extends AppCompatActivity {
@@ -36,183 +37,198 @@ public class MediaViewerActivity extends AppCompatActivity {
     private PlayerView playerView;
     private ExoPlayer player;
     private PhotoView imageView;
-    private ImageButton backButton;
-    private ImageButton moreButton;
-    private ProgressBar progressBar;
+    private AppBarLayout controlsTop; // Контейнер для тулбара из макета
+    private View loadingProgress;
     private boolean isUiVisible = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Режим без границ (Fullscreen)
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+
+        // 1. Включаем Edge-to-Edge (MD3)
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setContentView(R.layout.activity_media_viewer);
 
         initViews();
+        applyWindowInsets(); // Обработка отступов под вырезы и статус-бар
+        setupFullscreenBehavior();
 
-        String mediaPath = getIntent().getStringExtra("MEDIA_PATH");
-        String mediaType = getIntent().getStringExtra("MEDIA_TYPE");
+        String path = getIntent().getStringExtra("MEDIA_PATH");
+        String type = getIntent().getStringExtra("MEDIA_TYPE");
 
-        if (mediaPath == null) {
-            Toast.makeText(this, "Media not found", Toast.LENGTH_SHORT).show();
+        if (path == null) {
             finish();
             return;
         }
 
-        backButton.setOnClickListener(v -> finish());
-        moreButton.setOnClickListener(this::showPopupMenu);
-
-        if ("VIDEO".equals(mediaType)) {
-            setupVideo(mediaPath);
+        if ("VIDEO".equals(type)) {
+            setupVideo(path);
         } else {
-            setupImage(mediaPath);
+            setupImage(path);
         }
     }
 
     private void initViews() {
         imageView = findViewById(R.id.full_image_view);
-        playerView = findViewById(R.id.player_view); // Теперь PlayerView
-        backButton = findViewById(R.id.btn_back);
-        moreButton = findViewById(R.id.btn_more);
-        progressBar = findViewById(R.id.loading_progress);
+        playerView = findViewById(R.id.player_view);
+        loadingProgress = findViewById(R.id.loading_progress);
+        controlsTop = findViewById(R.id.controls_top);
+
+        // Приводим результат findViewById к типу MaterialToolbar
+        com.google.android.material.appbar.MaterialToolbar toolbar = findViewById(R.id.toolbar);
+
+        if (toolbar != null) {
+            toolbar.setNavigationOnClickListener(v -> finish());
+        }
+
+        // Инициализируем кнопку "Еще"
+        View moreButton = findViewById(R.id.btn_more);
+        if (moreButton != null) {
+            moreButton.setOnClickListener(this::showMD3Menu);
+        }
+    }
+
+    private void applyWindowInsets() {
+        // Чтобы кнопки не накладывались на статус-бар или "челку"
+        ViewCompat.setOnApplyWindowInsetsListener(controlsTop, (v, windowInsets) -> {
+            Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(0, insets.top, 0, 0);
+            return windowInsets;
+        });
+    }
+
+    private void setupFullscreenBehavior() {
+        WindowInsetsControllerCompat controller = WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+        controller.setSystemBarsBehavior(WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
     }
 
     private void setupImage(String path) {
         imageView.setVisibility(View.VISIBLE);
-        playerView.setVisibility(View.GONE);
-        progressBar.setVisibility(View.VISIBLE);
+        loadingProgress.setVisibility(View.VISIBLE);
 
-        Glide.with(this)
-                .load(path)
-                .listener(new RequestListener<>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        progressBar.setVisibility(View.GONE);
-                        return false;
-                    }
+        Glide.with(this).load(path).listener(new RequestListener<>() {
+            @Override
+            public boolean onLoadFailed(@Nullable GlideException e, Object m, @NonNull Target<Drawable> t, boolean f) {
+                loadingProgress.setVisibility(View.GONE);
+                return false;
+            }
 
-                    @Override
-                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        progressBar.setVisibility(View.GONE);
-                        return false;
-                    }
-                })
-                .into(imageView);
+            @Override
+            public boolean onResourceReady(@NonNull Drawable r, @NonNull Object m, Target<Drawable> t, @NonNull DataSource d, boolean f) {
+                loadingProgress.setVisibility(View.GONE);
+                return false;
+            }
+        }).into(imageView);
 
         imageView.setOnPhotoTapListener((view, x, y) -> toggleUi());
     }
 
     private void setupVideo(String path) {
-        imageView.setVisibility(View.GONE);
         playerView.setVisibility(View.VISIBLE);
-        progressBar.setVisibility(View.VISIBLE);
-
-        initializePlayer(path);
-    }
-
-    private void initializePlayer(String path) {
         player = new ExoPlayer.Builder(this).build();
         playerView.setPlayer(player);
-
-        MediaItem mediaItem = MediaItem.fromUri(Uri.parse(path));
-        player.setMediaItem(mediaItem);
+        player.setMediaItem(MediaItem.fromUri(Uri.parse(path)));
 
         player.addListener(new Player.Listener() {
             @Override
             public void onPlaybackStateChanged(int state) {
                 if (state == Player.STATE_READY) {
-                    progressBar.setVisibility(View.GONE);
+                    loadingProgress.setVisibility(View.GONE);
                 }
             }
         });
 
         player.prepare();
-        player.play(); // Автозапуск
+        player.play();
 
-        // Слушатель нажатия для скрытия кнопок поверх видео
-        playerView.setOnClickListener(v -> toggleUi());
+        // Синхронизация интерфейса с контроллером плеера
+        playerView.setControllerVisibilityListener((PlayerView.ControllerVisibilityListener) visibility -> {
+            isUiVisible = (visibility == View.VISIBLE);
+            updateCustomControls();
+        });
     }
 
     @OptIn(markerClass = UnstableApi.class)
     private void toggleUi() {
-        isUiVisible = !isUiVisible;
-        float targetAlpha = isUiVisible ? 1f : 0f;
-
-        // Анимируем кнопки назад и меню
-        backButton.animate().alpha(targetAlpha).setDuration(250).start();
-        moreButton.animate().alpha(targetAlpha).setDuration(250).start();
-
-        // Управляем видимостью контроллера плеера
-        if (isUiVisible) {
-            playerView.showController();
-        } else {
-            playerView.hideController();
-        }
-    }
-
-    private void releasePlayer() {
         if (player != null) {
-            player.release();
-            player = null;
+            if (playerView.isControllerFullyVisible()) {
+                playerView.hideController();
+            } else {
+                playerView.showController();
+            }
+        } else {
+            isUiVisible = !isUiVisible;
+            updateCustomControls();
         }
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        releasePlayer(); // Освобождаем память при уходе с экрана
+    private void updateCustomControls() {
+        float alpha = isUiVisible ? 1f : 0f;
+
+        controlsTop.animate()
+                .alpha(alpha)
+                .setDuration(250)
+                .withStartAction(() -> {
+                    if (isUiVisible) controlsTop.setVisibility(View.VISIBLE);
+                })
+                .withEndAction(() -> {
+                    if (!isUiVisible) controlsTop.setVisibility(View.GONE);
+                })
+                .start();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        releasePlayer();
-    }
+    private void showMD3Menu(View v) {
+        androidx.appcompat.widget.PopupMenu popup = new androidx.appcompat.widget.PopupMenu(this, v);
 
-    // Твои методы showPopupMenu, shareMedia, deleteMedia остаются без изменений
-    private void showPopupMenu(View view) {
-        PopupMenu popupMenu = new PopupMenu(this, view);
-        popupMenu.getMenu().add("Save");
-        popupMenu.getMenu().add("Share");
-        popupMenu.getMenu().add("Delete");
+        popup.getMenu().add(0, 0, 0, "Save");
+        popup.getMenu().add(0, 1, 1, "Share");
+        popup.getMenu().add(0, 2, 2, "Delete");
 
-        popupMenu.setOnMenuItemClickListener(item -> {
-            String title = Objects.requireNonNull(item.getTitle()).toString();
-            String path = getIntent().getStringExtra("MEDIA_PATH");
-            switch (title) {
-                case "Save": saveMedia(); return true;
-                case "Share": shareMedia(path); return true;
-                case "Delete": deleteMedia(path); return true;
-                default: return false;
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case 0:
+                    saveMedia();
+                    return true;
+                case 1:
+                    shareMedia();
+                    return true;
+                case 2:
+                    deleteMedia();
+                    return true;
+                default:
+                    return false;
             }
         });
-        popupMenu.show();
+
+        popup.show();
     }
 
-    private void shareMedia(String path) {
-        if (path == null) return;
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        String type = "VIDEO".equals(getIntent().getStringExtra("MEDIA_TYPE")) ? "video/*" : "image/*";
-        intent.setType(type);
-        intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(path));
-        startActivity(Intent.createChooser(intent, "Share via..."));
+    private void deleteMedia() {
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Delete media?")
+                .setMessage("Are you sure you want to delete?")
+                .setPositiveButton("Delete", (d, w) -> {
+                    // Логика удаления
+                    finish();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     private void saveMedia() {
         Toast.makeText(this, "Saved to Gallery", Toast.LENGTH_SHORT).show();
     }
 
-    private void deleteMedia(String path) {
-        new AlertDialog.Builder(this)
-                .setTitle("Delete?")
-                .setMessage("Are you sure you want to delete this media?")
-                .setPositiveButton("Delete", (dialog, which) -> {
-                    Intent resultIntent = new Intent();
-                    resultIntent.putExtra("DELETED_PATH", path);
-                    setResult(RESULT_OK, resultIntent);
-                    finish();
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+    private void shareMedia() {
+        // Логика Share
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (player != null) {
+            player.release(); // Освобождение ресурсов плеера
+            player = null;
+        }
     }
 }
