@@ -8,7 +8,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import by.hasanxd5.teenvana.R;
 import by.hasanxd5.teenvana.models.Message;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -62,6 +65,11 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         return messages.size();
     }
 
+    private static String formatTimestamp(long timestamp) {
+        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+        return sdf.format(new Date(timestamp));
+    }
+
     static class SentMessageViewHolder extends RecyclerView.ViewHolder {
         private final TextView textViewMessage;
         private final TextView textViewTime;
@@ -74,8 +82,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         public void bind(Message message) {
             textViewMessage.setText(message.getText());
-            // TODO: Format timestamp
-            textViewTime.setText("12:34 PM");
+            textViewTime.setText(formatTimestamp(message.getTimestamp()));
         }
     }
 
@@ -91,8 +98,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         public void bind(Message message) {
             textViewMessage.setText(message.getText());
-            // TODO: Format timestamp
-            textViewTime.setText("12:35 PM");
+            textViewTime.setText(formatTimestamp(message.getTimestamp()));
         }
     }
 }

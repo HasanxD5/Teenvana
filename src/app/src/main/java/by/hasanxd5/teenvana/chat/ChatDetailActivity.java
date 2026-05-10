@@ -44,7 +44,7 @@ public class ChatDetailActivity extends AppCompatActivity {
         TextView toolbarStatus = findViewById(R.id.toolbarStatus);
         if (chat != null) {
             toolbarTitle.setText(chat.getOtherUser().getName());
-            toolbarStatus.setText("online");
+            toolbarStatus.setText(R.string.status_online);
         }
 
         recyclerView = findViewById(R.id.recyclerViewMessages);

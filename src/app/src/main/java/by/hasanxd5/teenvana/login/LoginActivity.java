@@ -76,7 +76,7 @@ public class LoginActivity extends AppCompatActivity {
             String login = loginPrompt.getText().toString().trim();
             String password = passwordPrompt.getText().toString().trim();
 
-            if (login.equals("admin") && password.equals("admin")) {
+            if ("admin".equals(login) && "admin".equals(password)) {
                 Toast.makeText(LoginActivity.this, "Login successful", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);

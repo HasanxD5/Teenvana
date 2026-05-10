@@ -8,7 +8,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import by.hasanxd5.teenvana.R;
 import by.hasanxd5.teenvana.models.Chat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder> {
 
@@ -42,8 +45,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
         return chats.size();
     }
 
-    static class ChatViewHolder extends RecyclerView.ViewHolder {
-        private final com.google.android.material.imageview.ShapeableImageView imageViewAvatar;
+    public static class ChatViewHolder extends RecyclerView.ViewHolder {
         private final TextView textViewName;
         private final TextView textViewLastMessage;
         private final TextView textViewTime;
@@ -51,7 +53,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
         public ChatViewHolder(@NonNull View itemView) {
             super(itemView);
-            imageViewAvatar = itemView.findViewById(R.id.imageViewAvatar);
             textViewName = itemView.findViewById(R.id.textViewName);
             textViewLastMessage = itemView.findViewById(R.id.textViewLastMessage);
             textViewTime = itemView.findViewById(R.id.textViewTime);
@@ -62,8 +63,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
             textViewName.setText(chat.getOtherUser().getName());
             if (chat.getLastMessage() != null) {
                 textViewLastMessage.setText(chat.getLastMessage().getText());
-                // TODO: Format timestamp
-                textViewTime.setText("12:34 PM");
+                textViewTime.setText(formatTimestamp(chat.getLastMessage().getTimestamp()));
             } else {
                 textViewLastMessage.setText("");
                 textViewTime.setText("");
@@ -71,12 +71,17 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
             if (chat.getUnreadCount() > 0) {
                 textViewUnread.setVisibility(View.VISIBLE);
-                textViewUnread.setText("" + chat.getUnreadCount());
+                textViewUnread.setText(String.valueOf(chat.getUnreadCount()));
             } else {
                 textViewUnread.setVisibility(View.GONE);
             }
 
             itemView.setOnClickListener(v -> listener.onChatClick(chat));
+        }
+
+        private String formatTimestamp(long timestamp) {
+            SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+            return sdf.format(new Date(timestamp));
         }
     }
 }

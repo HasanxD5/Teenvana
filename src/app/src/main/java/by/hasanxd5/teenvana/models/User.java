@@ -3,9 +3,9 @@ package by.hasanxd5.teenvana.models;
 import java.io.Serializable;
 
 public class User implements Serializable {
-    private String id;
-    private String name;
-    private String avatarUrl;
+    private final String id;
+    private final String name;
+    private final String avatarUrl;
 
     public User(String id, String name, String avatarUrl) {
         this.id = id;
