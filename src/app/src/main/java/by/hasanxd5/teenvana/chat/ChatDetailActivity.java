@@ -1,5 +1,6 @@
 package by.hasanxd5.teenvana.chat;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -141,7 +142,8 @@ public class ChatDetailActivity extends AppCompatActivity {
         }
 
         BottomSheetDialog dialog = new BottomSheetDialog(this);
-        View view = getLayoutInflater().inflate(R.layout.dialog_media_picker, findViewById(android.R.id.content), false);
+        @SuppressLint("InflateParams")
+        View view = getLayoutInflater().inflate(R.layout.dialog_media_picker, null);
 
         TabLayout tabs = view.findViewById(R.id.mediaTabLayout);
         RecyclerView rv = view.findViewById(R.id.mediaRecyclerView);
@@ -154,28 +156,47 @@ public class ChatDetailActivity extends AppCompatActivity {
                         ? MediaHelper.TYPE_VIDEO
                         : MediaHelper.TYPE_IMAGE;
 
-                updateList(rv, selectedType, dialog);
+                // Передаем view, чтобы найти в нем кнопку
+                updateList(rv, selectedType, dialog, view);
             }
             @Override public void onTabUnselected(TabLayout.Tab t) {}
             @Override public void onTabReselected(TabLayout.Tab t) {}
         });
 
-        updateList(rv, MediaHelper.TYPE_IMAGE, dialog);
+        // Первичная загрузка
+        updateList(rv, MediaHelper.TYPE_IMAGE, dialog, view);
+
         dialog.setContentView(view);
         dialog.show();
     }
 
-    private void updateList(RecyclerView rv, String type, BottomSheetDialog dialog) {
+    // Обновленный метод для ChatDetailActivity
+    private void updateList(RecyclerView rv, String type, BottomSheetDialog dialog, View dialogView) {
         List<String> data = mediaHelper.fetchMedia(type);
 
-        if (data.isEmpty()) {
-            android.util.Log.d("CHAT_DEBUG", "No files found for type: " + type);
-        }
+        // Находим кнопку отправки в макете диалога
+        android.widget.Button btnSend = dialogView.findViewById(R.id.buttonSendMedia);
+        // Изначально скрываем кнопку, пока ничего не выбрано
+        btnSend.setVisibility(View.GONE);
 
-        rv.setAdapter(new MediaPickerAdapter(data, path -> {
-            sendMediaMessage(path, type);
-            dialog.dismiss();
-        }));
+        @SuppressLint("SetTextI18n") MediaPickerAdapter adapter = new MediaPickerAdapter(data, selectedPaths -> {
+            if (selectedPaths.isEmpty()) {
+                btnSend.setVisibility(View.GONE);
+            } else {
+                btnSend.setVisibility(View.VISIBLE);
+                btnSend.setText("Send (" + selectedPaths.size() + ")");
+            }
+
+            // Слушатель клика на кнопку "Отправить"
+            btnSend.setOnClickListener(v -> {
+                for (String path : selectedPaths) {
+                    sendMediaMessage(path, type);
+                }
+                dialog.dismiss();
+            });
+        });
+
+        rv.setAdapter(adapter);
     }
 
     private void sendMessage() {

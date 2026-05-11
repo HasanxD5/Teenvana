@@ -30,13 +30,13 @@ public class MediaPickerAdapter extends RecyclerView.Adapter<MediaPickerAdapter.
     @Override
     public void onBindViewHolder(@NonNull ViewHolder h, int pos) {
         String uriString = list.get(pos);
-        Uri uri = Uri.parse(uriString);
+        Uri uri = Uri.parse(uriString); // Парсим строку обратно в URI
 
         Glide.with(h.itemView.getContext())
                 .load(uri)
                 .centerCrop()
-                .placeholder(android.R.drawable.ic_menu_gallery)
-                .error(android.R.drawable.stat_notify_error)
+                .placeholder(android.R.drawable.ic_menu_gallery) // Пока грузится
+                .error(android.R.drawable.stat_notify_error)    // Если ошибка
                 .into((ImageView) h.itemView);
 
         h.itemView.setOnClickListener(v -> listener.onClick(uriString));
