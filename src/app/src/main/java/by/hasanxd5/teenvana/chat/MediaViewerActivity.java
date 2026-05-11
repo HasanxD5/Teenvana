@@ -26,7 +26,7 @@ import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
-import com.github.chrisbanes.photoview.PhotoView;
+import io.getstream.photoview.PhotoView;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -37,7 +37,7 @@ public class MediaViewerActivity extends AppCompatActivity {
     private PlayerView playerView;
     private ExoPlayer player;
     private PhotoView imageView;
-    private AppBarLayout controlsTop; // Контейнер для тулбара из макета
+    private AppBarLayout controlsTop;
     private View loadingProgress;
     private boolean isUiVisible = true;
 
@@ -45,12 +45,11 @@ public class MediaViewerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 1. Включаем Edge-to-Edge (MD3)
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setContentView(R.layout.activity_media_viewer);
 
         initViews();
-        applyWindowInsets(); // Обработка отступов под вырезы и статус-бар
+        applyWindowInsets();
         setupFullscreenBehavior();
 
         String path = getIntent().getStringExtra("MEDIA_PATH");
@@ -74,14 +73,12 @@ public class MediaViewerActivity extends AppCompatActivity {
         loadingProgress = findViewById(R.id.loading_progress);
         controlsTop = findViewById(R.id.controls_top);
 
-        // Приводим результат findViewById к типу MaterialToolbar
         com.google.android.material.appbar.MaterialToolbar toolbar = findViewById(R.id.toolbar);
 
         if (toolbar != null) {
             toolbar.setNavigationOnClickListener(v -> finish());
         }
 
-        // Инициализируем кнопку "Еще"
         View moreButton = findViewById(R.id.btn_more);
         if (moreButton != null) {
             moreButton.setOnClickListener(this::showMD3Menu);
@@ -89,7 +86,6 @@ public class MediaViewerActivity extends AppCompatActivity {
     }
 
     private void applyWindowInsets() {
-        // Чтобы кнопки не накладывались на статус-бар или "челку"
         ViewCompat.setOnApplyWindowInsetsListener(controlsTop, (v, windowInsets) -> {
             Insets insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(0, insets.top, 0, 0);
@@ -141,7 +137,6 @@ public class MediaViewerActivity extends AppCompatActivity {
         player.prepare();
         player.play();
 
-        // Синхронизация интерфейса с контроллером плеера
         playerView.setControllerVisibilityListener((PlayerView.ControllerVisibilityListener) visibility -> {
             isUiVisible = (visibility == View.VISIBLE);
             updateCustomControls();
@@ -208,7 +203,6 @@ public class MediaViewerActivity extends AppCompatActivity {
                 .setTitle("Delete media?")
                 .setMessage("Are you sure you want to delete?")
                 .setPositiveButton("Delete", (d, w) -> {
-                    // Логика удаления
                     finish();
                 })
                 .setNegativeButton("Cancel", null)
@@ -220,14 +214,14 @@ public class MediaViewerActivity extends AppCompatActivity {
     }
 
     private void shareMedia() {
-        // Логика Share
+
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         if (player != null) {
-            player.release(); // Освобождение ресурсов плеера
+            player.release();
             player = null;
         }
     }

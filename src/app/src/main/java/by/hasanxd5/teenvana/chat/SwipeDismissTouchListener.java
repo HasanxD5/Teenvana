@@ -24,13 +24,12 @@ public class SwipeDismissTouchListener implements View.OnTouchListener {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 downY = event.getRawY();
-                return false; // Позволяем PhotoView обрабатывать зум
+                return false;
 
             case MotionEvent.ACTION_MOVE:
                 float deltaY = event.getRawY() - downY;
                 if (Math.abs(deltaY) > slop) {
                     view.setTranslationY(deltaY);
-                    // Эффект прозрачности при смахивании
                     float alpha = 1f - (Math.abs(deltaY) / v.getHeight());
                     view.setAlpha(Math.max(0.5f, alpha));
                     return true;
@@ -40,8 +39,7 @@ public class SwipeDismissTouchListener implements View.OnTouchListener {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
                 float upDeltaY = event.getRawY() - downY;
-                if (Math.abs(upDeltaY) > v.getHeight() / 4) {
-                    // Если смахнули больше чем на четверть экрана — закрываем
+                if (Math.abs(upDeltaY) > (float) v.getHeight() / 4) {
                     view.animate()
                             .translationY(upDeltaY > 0 ? v.getHeight() : -v.getHeight())
                             .alpha(0)
@@ -54,7 +52,6 @@ public class SwipeDismissTouchListener implements View.OnTouchListener {
                                 }
                             });
                 } else {
-                    // Возвращаем на место, если смахнули чуть-чуть
                     view.animate().translationY(0).alpha(1f).setDuration(200);
                 }
                 break;

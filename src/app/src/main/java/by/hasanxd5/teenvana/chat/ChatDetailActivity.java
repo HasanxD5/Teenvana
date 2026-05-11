@@ -45,8 +45,8 @@ public class ChatDetailActivity extends AppCompatActivity {
         window.setNavigationBarColor(darkColor);
 
         WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(window, window.getDecorView());
-        controller.setAppearanceLightStatusBars(false); // false = белые иконки
-        controller.setAppearanceLightNavigationBars(false); // false = белые иконки
+        controller.setAppearanceLightStatusBars(false);
+        controller.setAppearanceLightNavigationBars(false);
 
         Chat chat = (Chat) getIntent().getSerializableExtra("chat");
 
@@ -130,7 +130,7 @@ public class ChatDetailActivity extends AppCompatActivity {
                         android.Manifest.permission.READ_MEDIA_IMAGES,
                         android.Manifest.permission.READ_MEDIA_VIDEO
                 }, 100);
-                return; // Прерываем метод, пока пользователь не даст разрешение
+                return;
             }
         } else {
             // Check for Android 12
@@ -150,7 +150,6 @@ public class ChatDetailActivity extends AppCompatActivity {
         tabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                // Теперь у нас только 0 (Фото) и 1 (Видео)
                 String selectedType = (tab.getPosition() == 1)
                         ? MediaHelper.TYPE_VIDEO
                         : MediaHelper.TYPE_IMAGE;
@@ -185,7 +184,7 @@ public class ChatDetailActivity extends AppCompatActivity {
             Message newMessage = new Message(
                     "" + System.currentTimeMillis(),
                     "me",
-                    text, // переменная с текстом сообщения
+                    text,
                     System.currentTimeMillis(),
                     "TEXT",
                     null

@@ -36,8 +36,8 @@ public class LoginActivity extends AppCompatActivity {
         window.setNavigationBarColor(darkColor);
 
         WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(window, window.getDecorView());
-        controller.setAppearanceLightStatusBars(false); // false = белые иконки
-        controller.setAppearanceLightNavigationBars(false); // false = белые иконки
+        controller.setAppearanceLightStatusBars(false);
+        controller.setAppearanceLightNavigationBars(false);
 
         // Standard Edge-to-Edge padding setup
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.login), (v, insets) -> {

@@ -21,7 +21,6 @@ public class MediaHelper {
         }
 
         String[] projection = {MediaStore.MediaColumns._ID};
-        // Пока уберем все фильтры (selection), чтобы увидеть вообще все файлы
         String sortOrder = MediaStore.MediaColumns.DATE_ADDED + " DESC";
 
         try (Cursor cursor = contentResolver.query(collection, projection, null, null, sortOrder)) {

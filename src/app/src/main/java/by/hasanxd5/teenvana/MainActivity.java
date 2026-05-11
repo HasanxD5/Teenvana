@@ -27,8 +27,8 @@ public class MainActivity extends AppCompatActivity {
         window.setNavigationBarColor(darkColor);
 
         WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(window, window.getDecorView());
-        controller.setAppearanceLightStatusBars(false); // false = белые иконки
-        controller.setAppearanceLightNavigationBars(false); // false = белые иконки
+        controller.setAppearanceLightStatusBars(false);
+        controller.setAppearanceLightNavigationBars(false);
 
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment_main);

@@ -10,9 +10,9 @@
     android:background="@color/md_theme_background"
     tools:context=".login.LoginActivity">
 
-    <!-- Заголовок: убрал фиксированные 200dp, сделал адаптивное положение -->
 
-    <!-- Ссылки внизу: прижаты к нижней части экрана -->
+
+
 
     <LinearLayout
         android:id="@+id/loginForm"

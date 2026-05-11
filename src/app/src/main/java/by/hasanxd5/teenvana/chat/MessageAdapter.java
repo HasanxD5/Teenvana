@@ -78,20 +78,18 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     static class SentMessageViewHolder extends RecyclerView.ViewHolder {
         private final TextView textViewMessage;
         private final TextView textViewTime;
-        private final ImageView messageImageView; // 1. Объявляем поле
+        private final ImageView messageImageView;
 
         public SentMessageViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewMessage = itemView.findViewById(R.id.textViewMessage);
             textViewTime = itemView.findViewById(R.id.textViewTime);
-            // 2. Связываем с XML
             messageImageView = itemView.findViewById(R.id.messageImageView);
         }
 
         public void bind(Message message) {
             String type = message.getType();
 
-            // 1. Логика отображения: только IMAGE и VIDEO
             if ("IMAGE".equals(type) || "VIDEO".equals(type)) {
                 messageImageView.setVisibility(View.VISIBLE);
                 textViewMessage.setVisibility(View.GONE);
@@ -103,16 +101,13 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                         .centerCrop()
                         .into(messageImageView);
             } else {
-                // Если это обычный текст
                 messageImageView.setVisibility(View.GONE);
                 textViewMessage.setVisibility(View.VISIBLE);
                 textViewMessage.setText(message.getText());
             }
 
-            // Установка времени
             textViewTime.setText(formatTimestamp(message.getTimestamp()));
 
-            // 2. Обработка клика: открываем просмотрщик только для фото и видео
             itemView.setOnClickListener(v -> {
                 if ("IMAGE".equals(type) || "VIDEO".equals(type)) {
                     android.content.Intent intent = new android.content.Intent(v.getContext(), MediaViewerActivity.class);
@@ -127,13 +122,12 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     static class ReceivedMessageViewHolder extends RecyclerView.ViewHolder {
         private final TextView textViewMessage;
         private final TextView textViewTime;
-        private final ImageView messageImageView; // 1. Объявляем поле
+        private final ImageView messageImageView;
 
         public ReceivedMessageViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewMessage = itemView.findViewById(R.id.textViewMessage);
             textViewTime = itemView.findViewById(R.id.textViewTime);
-            // 2. Связываем с XML
             messageImageView = itemView.findViewById(R.id.messageImageView);
         }
 
