@@ -1,8 +1,13 @@
 package by.hasanxd5.teenvana.chat;
 
+import android.content.ContentValues;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Toast;
 
@@ -10,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.OptIn;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
@@ -31,6 +37,13 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import by.hasanxd5.teenvana.R;
+import by.hasanxd5.teenvana.models.Message;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URLConnection;
 
 public class MediaViewerActivity extends AppCompatActivity {
 
@@ -60,7 +73,7 @@ public class MediaViewerActivity extends AppCompatActivity {
             return;
         }
 
-        if ("VIDEO".equals(type)) {
+        if (Message.TYPE_VIDEO.equals(type)) {
             setupVideo(path);
         } else {
             setupImage(path);
@@ -202,19 +215,73 @@ public class MediaViewerActivity extends AppCompatActivity {
         new MaterialAlertDialogBuilder(this)
                 .setTitle("Delete media?")
                 .setMessage("Are you sure you want to delete?")
-                .setPositiveButton("Delete", (d, w) -> {
-                    finish();
-                })
+                .setPositiveButton("Delete", (d, w) -> finish())
                 .setNegativeButton("Cancel", null)
                 .show();
     }
 
     private void saveMedia() {
-        Toast.makeText(this, "Saved to Gallery", Toast.LENGTH_SHORT).show();
+        String path = getIntent().getStringExtra("MEDIA_PATH");
+        if (path == null) return;
+
+        Uri uri = Uri.parse(path);
+        String fileName = "Teenvana_" + System.currentTimeMillis();
+        String mimeType = URLConnection.guessContentTypeFromName(path);
+        if (mimeType == null) mimeType = "image/jpeg";
+
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
+        values.put(MediaStore.MediaColumns.MIME_TYPE, mimeType);
+        
+        values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/Teenvana");
+        values.put(MediaStore.MediaColumns.IS_PENDING, 1);
+
+        Uri collection = (mimeType.startsWith("video")) 
+            ? MediaStore.Video.Media.EXTERNAL_CONTENT_URI 
+            : MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+
+        Uri resultUri = getContentResolver().insert(collection, values);
+
+        if (resultUri != null) {
+            try (InputStream is = getContentResolver().openInputStream(uri);
+                 OutputStream os = getContentResolver().openOutputStream(resultUri)) {
+                
+                if (is != null && os != null) {
+                    byte[] buffer = new byte[4096];
+                    int len;
+                    while ((len = is.read(buffer)) != -1) {
+                        os.write(buffer, 0, len);
+                    }
+                }
+
+                values.clear();
+                values.put(MediaStore.MediaColumns.IS_PENDING, 0);
+                getContentResolver().update(resultUri, values, null, null);
+                
+                Toast.makeText(this, "Saved to Gallery", Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                Toast.makeText(this, "Failed to save: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private void shareMedia() {
+        String path = getIntent().getStringExtra("MEDIA_PATH");
+        if (path == null) return;
 
+        Uri uri = Uri.parse(path);
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType(URLConnection.guessContentTypeFromName(path));
+        
+        // If it's a content URI from our own app, we might need FileProvider
+        // But here we assume it's already a public URI or handle it via FileProvider if it's a file
+        if (path.startsWith("/")) {
+            uri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", new File(path));
+        }
+        
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(Intent.createChooser(shareIntent, "Share Media via"));
     }
 
     @Override

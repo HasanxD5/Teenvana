@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide;
 import by.hasanxd5.teenvana.R;
 import by.hasanxd5.teenvana.models.Message;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -24,11 +25,42 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private static final int TYPE_RECEIVED = 2;
 
     private final List<Message> messages;
+    private List<Message> messagesFull;
     private final String currentUserId;
+    private OnMessageActionListener actionListener;
+
+    public interface OnMessageActionListener {
+        void onMessageLongClick(Message message, int position);
+    }
 
     public MessageAdapter(List<Message> messages, String currentUserId) {
         this.messages = messages;
+        this.messagesFull = new ArrayList<>(messages);
         this.currentUserId = currentUserId;
+    }
+
+    public void setOnMessageActionListener(OnMessageActionListener listener) {
+        this.actionListener = listener;
+    }
+
+    public void updateList(List<Message> newList) {
+        this.messagesFull = new ArrayList<>(newList);
+        filter(""); // Reset filter
+    }
+
+    public void filter(String query) {
+        messages.clear();
+        if (query.isEmpty()) {
+            messages.addAll(messagesFull);
+        } else {
+            String lowerCaseQuery = query.toLowerCase().trim();
+            for (Message message : messagesFull) {
+                if (message.getText() != null && message.getText().toLowerCase().contains(lowerCaseQuery)) {
+                    messages.add(message);
+                }
+            }
+        }
+        notifyDataSetChanged();
     }
 
     @Override
@@ -58,9 +90,9 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         Message message = messages.get(position);
         if (holder instanceof SentMessageViewHolder) {
-            ((SentMessageViewHolder) holder).bind(message);
+            ((SentMessageViewHolder) holder).bind(message, actionListener, position);
         } else {
-            ((ReceivedMessageViewHolder) holder).bind(message);
+            ((ReceivedMessageViewHolder) holder).bind(message, actionListener, position);
         }
 
     }
@@ -87,10 +119,10 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             messageImageView = itemView.findViewById(R.id.messageImageView);
         }
 
-        public void bind(Message message) {
+        public void bind(Message message, OnMessageActionListener listener, int position) {
             String type = message.getType();
 
-            if ("IMAGE".equals(type) || "VIDEO".equals(type)) {
+            if (Message.TYPE_IMAGE.equals(type) || Message.TYPE_VIDEO.equals(type) || Message.TYPE_GIF.equals(type)) {
                 messageImageView.setVisibility(View.VISIBLE);
                 textViewMessage.setVisibility(View.GONE);
 
@@ -109,12 +141,20 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             textViewTime.setText(formatTimestamp(message.getTimestamp()));
 
             itemView.setOnClickListener(v -> {
-                if ("IMAGE".equals(type) || "VIDEO".equals(type)) {
+                if (Message.TYPE_IMAGE.equals(type) || Message.TYPE_VIDEO.equals(type)) {
                     android.content.Intent intent = new android.content.Intent(v.getContext(), MediaViewerActivity.class);
                     intent.putExtra("MEDIA_PATH", message.getUrl());
                     intent.putExtra("MEDIA_TYPE", type);
                     v.getContext().startActivity(intent);
                 }
+            });
+
+            itemView.setOnLongClickListener(v -> {
+                if (listener != null) {
+                    listener.onMessageLongClick(message, position);
+                    return true;
+                }
+                return false;
             });
         }
     }
@@ -131,8 +171,9 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             messageImageView = itemView.findViewById(R.id.messageImageView);
         }
 
-        public void bind(Message message) {
-            if ("IMAGE".equals(message.getType()) || "GIF".equals(message.getType())) {
+        public void bind(Message message, OnMessageActionListener listener, int position) {
+            String type = message.getType();
+            if (Message.TYPE_IMAGE.equals(type) || Message.TYPE_VIDEO.equals(type) || Message.TYPE_GIF.equals(type)) {
                 messageImageView.setVisibility(View.VISIBLE);
                 textViewMessage.setVisibility(View.GONE);
 
@@ -148,6 +189,23 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 textViewMessage.setText(message.getText());
             }
             textViewTime.setText(formatTimestamp(message.getTimestamp()));
+
+            itemView.setOnClickListener(v -> {
+                if (Message.TYPE_IMAGE.equals(type) || Message.TYPE_VIDEO.equals(type)) {
+                    android.content.Intent intent = new android.content.Intent(v.getContext(), MediaViewerActivity.class);
+                    intent.putExtra("MEDIA_PATH", message.getUrl());
+                    intent.putExtra("MEDIA_TYPE", type);
+                    v.getContext().startActivity(intent);
+                }
+            });
+
+            itemView.setOnLongClickListener(v -> {
+                if (listener != null) {
+                    listener.onMessageLongClick(message, position);
+                    return true;
+                }
+                return false;
+            });
         }
     }
 

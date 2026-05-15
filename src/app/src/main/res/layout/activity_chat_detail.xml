@@ -96,7 +96,7 @@
             android:src="@android:drawable/ic_menu_edit"
             app:tint="?attr/colorOnSurfaceVariant" />
 
-        <EditText
+        <com.vanniktech.emoji.EmojiEditText
             android:id="@+id/editTextMessage"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
