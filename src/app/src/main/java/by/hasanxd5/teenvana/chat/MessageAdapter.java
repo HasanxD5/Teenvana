@@ -1,5 +1,6 @@
 package by.hasanxd5.teenvana.chat;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         filter(""); // Reset filter
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void filter(String query) {
         messages.clear();
         if (query.isEmpty()) {
