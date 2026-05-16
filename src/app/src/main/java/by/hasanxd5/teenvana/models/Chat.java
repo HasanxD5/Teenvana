@@ -3,10 +3,10 @@ package by.hasanxd5.teenvana.models;
 import java.io.Serializable;
 
 public class Chat implements Serializable {
-    private String id;
-    private User otherUser;
-    private Message lastMessage;
-    private int unreadCount;
+    private final String id;
+    private final User otherUser;
+    private final Message lastMessage;
+    private final int unreadCount;
 
     public Chat(String id, User otherUser, Message lastMessage, int unreadCount) {
         this.id = id;

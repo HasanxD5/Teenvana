@@ -17,7 +17,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,13 +27,11 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.tabs.TabLayout;
 import com.vanniktech.emoji.EmojiEditText;
 import com.vanniktech.emoji.EmojiManager;
-import com.vanniktech.emoji.EmojiPopup;
 import com.vanniktech.emoji.google.GoogleEmojiProvider;
 
 import by.hasanxd5.teenvana.R;
@@ -55,11 +52,9 @@ public class ChatDetailActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private EmojiEditText editTextMessage;
     private MediaHelper mediaHelper;
-    private EmojiPopup emojiPopup;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        // Initialize EmojiManager before super.onCreate if not done in Application class
         EmojiManager.install(new GoogleEmojiProvider());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_detail);
@@ -118,7 +113,6 @@ public class ChatDetailActivity extends AppCompatActivity {
         });
 
         messages = new ArrayList<>();
-        // Mock some messages
         messages.add(new Message("1", "other", "Hello!", System.currentTimeMillis(), Message.TYPE_TEXT, null));
         messages.add(new Message("2", "me", "Hi there!", System.currentTimeMillis(), Message.TYPE_TEXT, null));
 
@@ -127,31 +121,9 @@ public class ChatDetailActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         buttonSend.setOnClickListener(v -> sendMessage());
-        
-        setupEmojiPicker();
-        
+
         mediaHelper = new MediaHelper(getContentResolver());
         findViewById(R.id.buttonAttach).setOnClickListener(v -> showMediaPicker());
-
-        getOnBackPressedDispatcher().addCallback(this, new androidx.activity.OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                if (emojiPopup != null && emojiPopup.isShowing()) {
-                    emojiPopup.dismiss();
-                } else {
-                    finish();
-                }
-            }
-        });
-    }
-
-    private void setupEmojiPicker() {
-        View rootView = findViewById(R.id.appBarLayout).getRootView();
-        
-        // Use constructor directly as per version 0.24.1
-        emojiPopup = new EmojiPopup(rootView, editTextMessage);
-
-        findViewById(R.id.buttonEmoji).setOnClickListener(v -> emojiPopup.toggle());
     }
 
     @Override
@@ -232,7 +204,6 @@ public class ChatDetailActivity extends AppCompatActivity {
     private void muteChat(int hours) {
         String message = hours == -1 ? "Muted forever" : "Muted for " + hours + " hours";
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-        // TODO: Save preference and handle in notification service
     }
 
     private void unmuteChat() {
@@ -261,8 +232,6 @@ public class ChatDetailActivity extends AppCompatActivity {
     }
 
     private void showMediaPicker() {
-
-        // --- Request permissions ---
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             if (checkSelfPermission(android.Manifest.permission.READ_MEDIA_IMAGES) != android.content.pm.PackageManager.PERMISSION_GRANTED ||
                     checkSelfPermission(android.Manifest.permission.READ_MEDIA_VIDEO) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
@@ -274,7 +243,6 @@ public class ChatDetailActivity extends AppCompatActivity {
                 return;
             }
         } else {
-            // Check for Android 12
             if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, 100);
                 return;
@@ -296,27 +264,22 @@ public class ChatDetailActivity extends AppCompatActivity {
                         ? MediaHelper.TYPE_VIDEO
                         : MediaHelper.TYPE_IMAGE;
 
-                // Передаем view, чтобы найти в нем кнопку
                 updateList(rv, selectedType, dialog, view);
             }
             @Override public void onTabUnselected(TabLayout.Tab t) {}
             @Override public void onTabReselected(TabLayout.Tab t) {}
         });
 
-        // Первичная загрузка
         updateList(rv, MediaHelper.TYPE_IMAGE, dialog, view);
 
         dialog.setContentView(view);
         dialog.show();
     }
 
-    // Обновленный метод для ChatDetailActivity
     private void updateList(RecyclerView rv, String type, BottomSheetDialog dialog, View dialogView) {
         List<String> data = mediaHelper.fetchMedia(type);
 
-        // Находим кнопку отправки в макете диалога
         android.widget.Button btnSend = dialogView.findViewById(R.id.buttonSendMedia);
-        // Изначально скрываем кнопку, пока ничего не выбрано
         btnSend.setVisibility(View.GONE);
 
         MediaPickerAdapter adapter = new MediaPickerAdapter(data, selectedPaths -> {
@@ -327,7 +290,6 @@ public class ChatDetailActivity extends AppCompatActivity {
                 btnSend.setText(getString(R.string.media_send_button, selectedPaths.size()));
             }
 
-            // Слушатель клика на кнопку "Отправить"
             btnSend.setOnClickListener(v -> {
                 for (String path : selectedPaths) {
                     sendMediaMessage(path, type);
@@ -365,21 +327,21 @@ public class ChatDetailActivity extends AppCompatActivity {
     private void showContextMenu(Message message, int position) {
         RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
         if (layoutManager == null) return;
-        
+
         View view = layoutManager.findViewByPosition(position);
         if (view == null) return;
 
         PopupMenu popup = new PopupMenu(this, view);
-        
+
         boolean isMedia = !Message.TYPE_TEXT.equals(message.getType());
-        
+
         if (isMedia) {
             popup.getMenu().add(0, 0, 0, "Save to Gallery");
             popup.getMenu().add(0, 1, 1, "Share");
         } else {
             popup.getMenu().add(0, 3, 0, "Copy Text");
         }
-        
+
         popup.getMenu().add(0, 2, 2, "Delete for me");
 
         popup.setOnMenuItemClickListener(item -> {
@@ -405,7 +367,10 @@ public class ChatDetailActivity extends AppCompatActivity {
 
     private void saveMedia(String path) {
         if (path == null) return;
-        Uri uri = Uri.parse(path);
+
+        // Correctly handle local paths vs URIs
+        Uri sourceUri = path.startsWith("/") ? Uri.fromFile(new File(path)) : Uri.parse(path);
+
         String fileName = "Teenvana_" + System.currentTimeMillis();
         String mimeType = URLConnection.guessContentTypeFromName(path);
         if (mimeType == null) mimeType = "image/jpeg";
@@ -413,20 +378,21 @@ public class ChatDetailActivity extends AppCompatActivity {
         ContentValues values = new ContentValues();
         values.put(MediaStore.MediaColumns.DISPLAY_NAME, fileName);
         values.put(MediaStore.MediaColumns.MIME_TYPE, mimeType);
-        
+
+        // Add relative path for Scoped Storage (Android 10+)
         values.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/Teenvana");
         values.put(MediaStore.MediaColumns.IS_PENDING, 1);
 
-        Uri collection = (mimeType.startsWith("video")) 
-            ? MediaStore.Video.Media.EXTERNAL_CONTENT_URI 
-            : MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+        Uri collection = (mimeType.startsWith("video"))
+                ? MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+                : MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 
         Uri resultUri = getContentResolver().insert(collection, values);
 
         if (resultUri != null) {
-            try (InputStream is = getContentResolver().openInputStream(uri);
+            try (InputStream is = getContentResolver().openInputStream(sourceUri);
                  OutputStream os = getContentResolver().openOutputStream(resultUri)) {
-                
+
                 if (is != null && os != null) {
                     byte[] buffer = new byte[4096];
                     int len;
@@ -438,7 +404,7 @@ public class ChatDetailActivity extends AppCompatActivity {
                 values.clear();
                 values.put(MediaStore.MediaColumns.IS_PENDING, 0);
                 getContentResolver().update(resultUri, values, null, null);
-                
+
                 Toast.makeText(this, "Saved to Gallery", Toast.LENGTH_SHORT).show();
             } catch (IOException e) {
                 Toast.makeText(this, "Failed to save: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -448,29 +414,37 @@ public class ChatDetailActivity extends AppCompatActivity {
 
     private void shareMedia(String path) {
         if (path == null) return;
-        Uri uri = Uri.parse(path);
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType(URLConnection.guessContentTypeFromName(path));
-        
+
+        Uri uri;
         if (path.startsWith("/")) {
             uri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", new File(path));
+        } else {
+            uri = Uri.parse(path);
         }
-        
+
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        String mimeType = URLConnection.guessContentTypeFromName(path);
+        shareIntent.setType(mimeType != null ? mimeType : "image/*");
+
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
         shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         startActivity(Intent.createChooser(shareIntent, "Share Media"));
     }
 
     private void deleteMessage(int position) {
-        messages.remove(position);
-        adapter.updateList(messages);
+        if (position >= 0 && position < messages.size()) {
+            messages.remove(position);
+            adapter.updateList(messages);
+        }
     }
 
     private void copyToClipboard(String text) {
         android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getSystemService(android.content.Context.CLIPBOARD_SERVICE);
-        android.content.ClipData clip = android.content.ClipData.newPlainText("Chat Message", text);
-        clipboard.setPrimaryClip(clip);
-        Toast.makeText(this, "Copied to clipboard", Toast.LENGTH_SHORT).show();
+        if (clipboard != null) {
+            android.content.ClipData clip = android.content.ClipData.newPlainText("Chat Message", text);
+            clipboard.setPrimaryClip(clip);
+            Toast.makeText(this, "Copied to clipboard", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void scrollToBottom() {
@@ -480,27 +454,18 @@ public class ChatDetailActivity extends AppCompatActivity {
     }
 
     private void sendMediaMessage(String filePath, String type) {
-        // 1. Create a unique ID for the message (usually based on timestamp)
         String messageId = String.valueOf(System.currentTimeMillis());
-
-        // 2. Get the current timestamp
         long currentTime = System.currentTimeMillis();
 
-        // 3. Create the Message object
-        // Assuming your Message constructor is: Message(id, senderId, text, timestamp, type, mediaUrl)
         Message mediaMessage = new Message(
                 messageId,
-                "me",           // Current user ID
-                null,           // No text for media messages
+                "me",
+                null,
                 currentTime,
-                type,           // "IMAGE", "VIDEO", or "GIF"
-                filePath        // Local path to the file
+                type,
+                filePath
         );
 
-        // 4. Add to your local list and update UI
         addMessage(mediaMessage);
-
-        // TODO: Later you will add Firebase Storage upload logic here
     }
-
 }
