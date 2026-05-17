@@ -33,13 +33,24 @@
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabCamera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="88dp" android:contentDescription="@string/desc_camera"
+        app:srcCompat="@drawable/ic_camera"
+        app:tint="?attr/colorOnPrimaryContainer"
+        app:backgroundTint="?attr/colorPrimaryContainer" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabNewChat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:contentDescription="New Chat"
-        app:srcCompat="@android:drawable/ic_menu_edit"
+        android:contentDescription="@string/desc_new_chat"
+        app:srcCompat="@drawable/ic_chat_add"
         app:tint="?attr/colorOnPrimaryContainer"
         app:backgroundTint="?attr/colorPrimaryContainer" />
 

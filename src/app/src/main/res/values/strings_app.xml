@@ -32,4 +32,15 @@
     <string name="media_tab_images">Images</string>
     <string name="media_tab_videos">Videos</string>
     <string name="media_send_button">Send (%1$d)</string>
+
+    <!-- Chat Detail Activity -->
+    <string name="hint_type_message">Type a message</string>
+    <string name="desc_emoji">Emoji</string>
+    <string name="desc_attach">Attach</string>
+    <string name="desc_send">Send</string>
+
+    <!-- Chats fragment -->
+    <string name="desc_new_chat">New Chat</string>
+    <string name="desc_camera">Open Camera</string>
+
 </resources>
