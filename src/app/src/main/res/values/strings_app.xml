@@ -2,7 +2,7 @@
 <resources>
     <!-- Main application information -->
     <string name="app_name">Teenvana</string>
-    <string name="app_version">Alpha 0.2</string>
+    <string name="app_version">Alpha 0.3</string>
 
     <!-- Main Screens Content -->
     <string name="chats_list_placeholder">Your conversations will appear here</string>
