@@ -1,12 +1,12 @@
 package by.hasanxd5.teenvana.login;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -14,6 +14,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
+import com.google.android.material.checkbox.MaterialCheckBox;
 
 import by.hasanxd5.teenvana.MainActivity;
 import by.hasanxd5.teenvana.R;
@@ -23,6 +24,13 @@ public class LoginActivity extends AppCompatActivity {
 
     private Button buttonSubmit;
     private TextView loginPrompt, passwordPrompt, linkSignUp, linkForgotPassword;
+    private MaterialCheckBox checkBoxRemember;
+    private SharedPreferences loginPreferences;
+    private SharedPreferences.Editor loginPrefsEditor;
+
+    private static final String PREF_NAME = "LoginPrefs";
+    private static final String KEY_USERNAME = "username";
+    private static final String KEY_REMEMBER = "rememberMe";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +55,7 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         initViews();
+        checkRememberedStatus(); // Проверяем старые сохранения при старте
         setupClickListeners();
     }
 
@@ -56,36 +65,59 @@ public class LoginActivity extends AppCompatActivity {
         buttonSubmit = findViewById(R.id.buttonSubmit);
         linkSignUp = findViewById(R.id.textViewSignUp);
         linkForgotPassword = findViewById(R.id.textViewForgotPassword);
+        checkBoxRemember = findViewById(R.id.checkBoxRemember);
+
+        // Initilization SharedPreferences
+        loginPreferences = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        loginPrefsEditor = loginPreferences.edit();
+    }
+
+    private void checkRememberedStatus() {
+        boolean saveLogin = loginPreferences.getBoolean(KEY_REMEMBER, false);
+        if (saveLogin) {
+            String savedUsername = loginPreferences.getString(KEY_USERNAME, "");
+            loginPrompt.setText(savedUsername);
+            checkBoxRemember.setChecked(true);
+        }
     }
 
     private void setupClickListeners() {
-        // English comment: Navigate to RegisterActivity when "Sign Up" is clicked
+        // Navigate to RegisterActivity when "Sign Up" is clicked
         linkSignUp.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
         });
 
-        // English comment: Handle "Forgot Password" click
+        // Handle "Forgot Password" click
         linkForgotPassword.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, ResetPasswordActivity.class);
             startActivity(intent);
         });
 
         buttonSubmit.setOnClickListener(v -> {
-
             String login = loginPrompt.getText().toString().trim();
             String password = passwordPrompt.getText().toString().trim();
 
             if ("admin".equals(login) && "admin".equals(password)) {
+
+                if (checkBoxRemember.isChecked()) {
+                    loginPrefsEditor.putBoolean(KEY_REMEMBER, true);
+                    loginPrefsEditor.putString(KEY_USERNAME, login);
+                } else {
+                    loginPrefsEditor.putBoolean(KEY_REMEMBER, false);
+                    loginPrefsEditor.putString(KEY_USERNAME, "");
+                }
+                loginPrefsEditor.apply();
+
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
-            }
-            else if (login.isEmpty() || password.isEmpty()) {
+                finish();
+
+            } else if (login.isEmpty() || password.isEmpty()) {
                 Toast.makeText(LoginActivity.this, "Please enter login and password", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(LoginActivity.this, "Login failed", Toast.LENGTH_SHORT).show();
             }
-
         });
     }
 }
