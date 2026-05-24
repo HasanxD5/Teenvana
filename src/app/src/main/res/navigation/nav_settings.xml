@@ -2,23 +2,11 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_main_menu_nav"
-    app:startDestination="@id/item_chats">
+    android:id="@+id/nav_settings"
+    app:startDestination="@id/settingsFragment">
 
     <fragment
-        android:id="@+id/item_chats"
-        android:name="by.hasanxd5.teenvana.fragments.ChatsFragment"
-        android:label="Chats"
-        tools:layout="@layout/fragment_main_chats" />
-
-    <fragment
-        android:id="@+id/item_contacts"
-        android:name="by.hasanxd5.teenvana.fragments.ContactsFragment"
-        android:label="Contacts"
-        tools:layout="@layout/fragment_main_contacts" />
-
-    <fragment
-        android:id="@+id/item_settings"
+        android:id="@+id/settingsFragment"
         android:name="by.hasanxd5.teenvana.fragments.SettingsFragment"
         android:label="Settings"
         tools:layout="@layout/fragment_main_settings">

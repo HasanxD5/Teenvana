@@ -43,4 +43,75 @@
     <string name="desc_new_chat">New Chat</string>
     <string name="desc_camera">Open Camera</string>
 
+    <!-- Main Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_account">Account</string>
+    <string name="settings_account_desc">Account settings</string>
+    <string name="settings_privacy">Privacy</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_chats">Chats</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_help">Help &amp; Support</string>
+    <string name="settings_logout">Logout</string>
+    <string name="settings_preferences_header">Preferences</string>
+    <string name="settings_default_status">Hey there! I am using Teenvana</string>
+
+    <!-- Account Settings -->
+    <string name="account_security">Security Notifications</string>
+    <string name="account_security_desc">Get notified of security alerts</string>
+    <string name="account_two_step">Two-step verification</string>
+    <string name="account_change_number">Change number</string>
+    <string name="account_delete">Delete account</string>
+
+    <!-- Privacy Settings -->
+    <string name="privacy_header_visibility">Who can see my personal info</string>
+    <string name="privacy_last_seen">Last seen and online</string>
+    <string name="privacy_everyone">Everyone</string>
+    <string name="privacy_profile_photo">Profile photo</string>
+    <string name="privacy_my_contacts">My contacts</string>
+    <string name="privacy_read_receipts">Read receipts</string>
+    <string name="privacy_read_receipts_desc">If turned off, you won\'t send or receive read receipts</string>
+    <string name="privacy_blocked_contacts">Blocked contacts</string>
+    <string name="privacy_none">None</string>
+
+    <!-- Notification Settings -->
+    <string name="notifications_header_messages">Messages</string>
+    <string name="notifications_header_groups">Groups</string>
+    <string name="notifications_tones">Conversation tones</string>
+    <string name="notifications_tones_desc">Play sounds for incoming and outgoing messages</string>
+    <string name="notifications_tone">Notification tone</string>
+    <string name="notifications_default">Default</string>
+    <string name="notifications_vibrate">Vibrate</string>
+    <string name="notifications_group">Group notifications</string>
+
+    <!-- Chat Settings -->
+    <string name="chats_header_display">Display</string>
+    <string name="chats_theme">Theme</string>
+    <string name="chats_theme_system">System default</string>
+    <string name="chats_wallpaper">Wallpaper</string>
+    <string name="chats_header_settings">Chat settings</string>
+    <string name="chats_enter_is_send">Enter is send</string>
+    <string name="chats_enter_is_send_desc">Enter key will send your message</string>
+    <string name="chats_font_size">Font size</string>
+    <string name="chats_font_size_medium">Medium</string>
+    <string name="chats_backup">Chat backup</string>
+    <string name="chats_history">Chat history</string>
+
+    <!-- Language Settings -->
+    <string name="lang_header">App language</string>
+    <string name="lang_en">English</string>
+    <string name="lang_ru">Русский (Russian)</string>
+    <string name="lang_be">Беларуская (Belarusian)</string>
+
+    <!-- Contacts Screen -->
+    <string name="contacts_no_contacts">No contacts yet</string>
+    <string name="contacts_empty_desc">Your contact list is empty. Invite your friends to download the app and start chatting!</string>
+    <string name="contacts_invite_friends">Invite Friends</string>
+
+    <!-- Common Dialogs -->
+    <string name="dialog_camera_mode">Select Camera Mode</string>
+    <string name="dialog_photo">Photo</string>
+    <string name="dialog_video">Video</string>
+    <string name="toast_logged_out">Logged out</string>
+
 </resources>

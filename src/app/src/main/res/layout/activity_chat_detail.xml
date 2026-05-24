@@ -18,11 +18,13 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimaryContainer"
-            app:navigationIcon="@drawable/ic_arrow_back"> <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            app:navigationIcon="@drawable/ic_arrow_back">
+            <LinearLayout
+                android:id="@+id/customToolbarContent"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/toolbarAvatar"
@@ -88,11 +90,11 @@
 
         <ImageButton
             android:id="@+id/buttonEmoji"
-            android:layout_width="48dp"
+            android:layout_width="44dp"
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/desc_emoji"
-            android:padding="12dp"
+            android:padding="10dp"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_add_reaction"
             app:tint="?attr/colorOnSurfaceVariant" />

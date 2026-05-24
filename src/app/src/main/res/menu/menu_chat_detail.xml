@@ -6,7 +6,7 @@
         android:id="@+id/action_search"
         android:icon="@android:drawable/ic_menu_search"
         android:title="Search"
-        app:showAsAction="ifRoom|collapseActionView"
+        app:showAsAction="always|collapseActionView"
         app:actionViewClass="androidx.appcompat.widget.SearchView" />
 
     <item
@@ -21,8 +21,8 @@
                 android:id="@+id/action_mute_8h"
                 android:title="Mute for 8 hours" />
             <item
-                android:id="@+id/action_mute_2d"
-                android:title="Mute for 2 days" />
+                android:id="@+id/action_mute_24h"
+                android:title="Mute for 24 hours" />
             <item
                 android:id="@+id/action_mute_forever"
                 android:title="Mute forever" />

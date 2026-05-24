@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -29,9 +31,13 @@ import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.textfield.TextInputEditText;
 import com.vanniktech.emoji.EmojiEditText;
 import com.vanniktech.emoji.EmojiManager;
+import com.vanniktech.emoji.EmojiTheming;
+import com.vanniktech.emoji.EmojiView;
 import com.vanniktech.emoji.google.GoogleEmojiProvider;
 
 import by.hasanxd5.teenvana.R;
@@ -44,6 +50,7 @@ import java.io.OutputStream;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ChatDetailActivity extends AppCompatActivity {
 
@@ -52,6 +59,7 @@ public class ChatDetailActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private EmojiEditText editTextMessage;
     private MediaHelper mediaHelper;
+    private ActionMode actionMode;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -84,15 +92,26 @@ public class ChatDetailActivity extends AppCompatActivity {
 
         if (chat != null) {
             toolbarTitle.setText(chat.getOtherUser().getName());
-            toolbarStatus.setText(R.string.status_online);
+            toolbarStatus.setText(chat.getOtherUser().getStatus());
             if (chat.getOtherUser().getAvatarUrl() != null) {
                 Glide.with(this).load(chat.getOtherUser().getAvatarUrl()).placeholder(R.drawable.ic_launcher_foreground).into(toolbarAvatar);
             }
+
+            View.OnClickListener profileClick = v -> {
+                Intent intent = new Intent(this, by.hasanxd5.teenvana.UserProfileActivity.class);
+                intent.putExtra("user", chat.getOtherUser());
+                startActivity(intent);
+            };
+
+            toolbarAvatar.setOnClickListener(profileClick);
+            toolbarTitle.setOnClickListener(profileClick);
+            findViewById(R.id.toolbarStatus).setOnClickListener(profileClick);
         }
 
         recyclerView = findViewById(R.id.recyclerViewMessages);
         editTextMessage = findViewById(R.id.editTextMessage);
         ImageButton buttonSend = findViewById(R.id.buttonSend);
+        ImageButton buttonEmoji = findViewById(R.id.buttonEmoji);
 
         buttonSend.setEnabled(false);
         buttonSend.setAlpha(0.5f);
@@ -117,13 +136,211 @@ public class ChatDetailActivity extends AppCompatActivity {
         messages.add(new Message("2", "me", "Hi there!", System.currentTimeMillis(), Message.TYPE_TEXT, null));
 
         adapter = new MessageAdapter(messages, "me");
-        adapter.setOnMessageActionListener(this::showContextMenu);
+        if (chat != null) {
+            adapter.setOtherUser(chat.getOtherUser());
+        }
+        adapter.setOnMessageActionListener(new MessageAdapter.OnMessageActionListener() {
+            @Override
+            public void onMessageLongClick(Message message, int position) {
+                if (actionMode == null) {
+                    startSupportActionMode(new MessageActionModeCallback());
+                }
+                adapter.toggleSelection(message.getId());
+            }
+
+            @Override
+            public void onSelectionChanged(int count) {
+                if (actionMode != null) {
+                    if (count == 0) {
+                        actionMode.finish();
+                    } else {
+                        actionMode.setTitle(String.valueOf(count));
+                    }
+                }
+            }
+
+            @Override
+            public void onShowSingleContextMenu(View view, Message message, int position) {
+                showSingleContextMenu(view, message, position);
+            }
+        });
         recyclerView.setAdapter(adapter);
 
         buttonSend.setOnClickListener(v -> sendMessage());
 
         mediaHelper = new MediaHelper(getContentResolver());
         findViewById(R.id.buttonAttach).setOnClickListener(v -> showMediaPicker());
+
+        buttonEmoji.setOnClickListener(v -> showExtrasPicker());
+    }
+
+    private void showExtrasPicker() {
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        @SuppressLint("InflateParams")
+        View view = getLayoutInflater().inflate(R.layout.dialog_chat_extras, null);
+        TabLayout tabLayout = view.findViewById(R.id.tabLayoutExtras);
+        FrameLayout container = view.findViewById(R.id.containerExtras);
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                container.removeAllViews();
+                switch (tab.getPosition()) {
+                    case 0: // Emoji
+                        EmojiView emojiView = new EmojiView(ChatDetailActivity.this);
+                        emojiView.setUp(
+                            findViewById(android.R.id.content),
+                            emoji -> editTextMessage.append(emoji.getUnicode()),
+                            () -> editTextMessage.dispatchKeyEvent(new android.view.KeyEvent(android.view.KeyEvent.ACTION_DOWN, android.view.KeyEvent.KEYCODE_DEL)),
+                            editTextMessage,
+                            EmojiTheming.Companion.from(ChatDetailActivity.this),
+                            new com.vanniktech.emoji.recent.RecentEmojiManager(ChatDetailActivity.this),
+                            new com.vanniktech.emoji.search.SearchEmojiManager(),
+                            new com.vanniktech.emoji.variant.VariantEmojiManager(ChatDetailActivity.this),
+                            null
+                        );
+                        container.addView(emojiView);
+                        break;
+                    case 1: // GIF
+                        @SuppressLint("InflateParams")
+                        View gifView = getLayoutInflater().inflate(R.layout.dialog_gif_picker, null);
+                        RecyclerView rvGifs = gifView.findViewById(R.id.rvGifs);
+                        List<String> mockGifs = new ArrayList<>();
+                        mockGifs.add("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJndGZ4ZWZ4ZWZ4ZWZ4ZWZ4ZWZ4ZWZ4ZWZ4ZWZ4ZWZ4ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKDkDbIDJieKbVm/giphy.gif");
+                        mockGifs.add("https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNHJndGZ4ZWZ4ZWZ4ZWZ4ZWZ4ZWZ4ZWZ4ZWZ4ZWZ4ZWZ4ZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKVUn7iM8FMEU24/giphy.gif");
+                        MediaPickerAdapter gifAdapter = new MediaPickerAdapter(mockGifs, selectedPaths -> {
+                            if (!selectedPaths.isEmpty()) {
+                                sendMediaMessage(selectedPaths.get(0), Message.TYPE_GIF);
+                                dialog.dismiss();
+                            }
+                        });
+                        rvGifs.setAdapter(gifAdapter);
+                        container.addView(gifView);
+                        break;
+                    case 2: // Stickers
+                        @SuppressLint("InflateParams")
+                        View stickerView = getLayoutInflater().inflate(R.layout.dialog_sticker_picker, null);
+                        RecyclerView rvStickers = stickerView.findViewById(R.id.rvStickers);
+                        List<String> mockStickers = new ArrayList<>();
+                        mockStickers.add("https://cdn-icons-png.flaticon.com/512/3536/3536394.png");
+                        mockStickers.add("https://cdn-icons-png.flaticon.com/512/3536/3536444.png");
+                        MediaPickerAdapter stickerAdapter = new MediaPickerAdapter(mockStickers, selectedPaths -> {
+                            if (!selectedPaths.isEmpty()) {
+                                sendMediaMessage(selectedPaths.get(0), Message.TYPE_IMAGE);
+                                dialog.dismiss();
+                            }
+                        });
+                        rvStickers.setAdapter(stickerAdapter);
+                        container.addView(stickerView);
+                        break;
+                }
+            }
+            @Override public void onTabUnselected(TabLayout.Tab t) {}
+            @Override public void onTabReselected(TabLayout.Tab t) {}
+        });
+
+        TabLayout.Tab tab = tabLayout.getTabAt(0);
+        if (tab != null) tab.select();
+        
+        dialog.setContentView(view);
+        dialog.show();
+    }
+
+    private void showSingleContextMenu(View view, Message message, int position) {
+        PopupMenu popup = new PopupMenu(this, view);
+        boolean isMedia = !Message.TYPE_TEXT.equals(message.getType());
+
+        if (isMedia) {
+            popup.getMenu().add(0, 0, 0, "Save to Gallery");
+            popup.getMenu().add(0, 1, 1, "Share");
+        } else {
+            popup.getMenu().add(0, 3, 0, "Copy Text");
+            popup.getMenu().add(0, 4, 1, "Edit Message");
+        }
+
+        popup.getMenu().add(0, 5, 2, "Forward");
+        popup.getMenu().add(0, 6, 3, "Send to another chat");
+        popup.getMenu().add(0, 7, 4, "Select");
+        popup.getMenu().add(0, 2, 5, "Delete for me");
+
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case 0:
+                    saveMedia(message.getUrl());
+                    return true;
+                case 1:
+                    shareMedia(message.getUrl());
+                    return true;
+                case 2:
+                    deleteMessage(position);
+                    return true;
+                case 3:
+                    copyToClipboard(message.getText());
+                    return true;
+                case 4:
+                    showEditMessageDialog(message, position);
+                    return true;
+                case 5:
+                case 6:
+                    Toast.makeText(this, "Forwarded", Toast.LENGTH_SHORT).show();
+                    return true;
+                case 7:
+                    if (actionMode == null) {
+                        startSupportActionMode(new MessageActionModeCallback());
+                    }
+                    adapter.toggleSelection(message.getId());
+                    return true;
+                default:
+                    return false;
+            }
+        });
+        popup.show();
+    }
+
+    private class MessageActionModeCallback implements ActionMode.Callback {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            actionMode = mode;
+            adapter.setSelectionMode(true);
+            mode.getMenuInflater().inflate(R.menu.menu_message_selection, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            List<Message> selected = adapter.getSelectedMessages();
+            int id = item.getItemId();
+            if (id == R.id.action_delete_selected) {
+                messages.removeAll(selected);
+                adapter.updateList(messages);
+                mode.finish();
+                return true;
+            } else if (id == R.id.action_forward_selected || id == R.id.action_send_another_selected) {
+                Toast.makeText(ChatDetailActivity.this, "Forwarded " + selected.size() + " messages", Toast.LENGTH_SHORT).show();
+                mode.finish();
+                return true;
+            } else if (id == R.id.action_copy_selected) {
+                StringBuilder sb = new StringBuilder();
+                for (Message m : selected) {
+                    if (m.getText() != null) sb.append(m.getText()).append("\n");
+                }
+                copyToClipboard(sb.toString());
+                mode.finish();
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            adapter.setSelectionMode(false);
+            actionMode = null;
+        }
     }
 
     @Override
@@ -149,7 +366,23 @@ public class ChatDetailActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_chat_detail, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
+        View customToolbarContent = findViewById(R.id.customToolbarContent);
+
         if (searchItem != null) {
+            searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+                @Override
+                public boolean onMenuItemActionExpand(MenuItem item) {
+                    if (customToolbarContent != null) customToolbarContent.setVisibility(View.GONE);
+                    return true;
+                }
+
+                @Override
+                public boolean onMenuItemActionCollapse(MenuItem item) {
+                    if (customToolbarContent != null) customToolbarContent.setVisibility(View.VISIBLE);
+                    return true;
+                }
+            });
+
             SearchView searchView = (SearchView) searchItem.getActionView();
             if (searchView != null) {
                 searchView.setQueryHint("Search messages...");
@@ -182,8 +415,8 @@ public class ChatDetailActivity extends AppCompatActivity {
         } else if (id == R.id.action_mute_8h) {
             muteChat(8);
             return true;
-        } else if (id == R.id.action_mute_2d) {
-            muteChat(48);
+        } else if (id == R.id.action_mute_24h) {
+            muteChat(24);
             return true;
         } else if (id == R.id.action_mute_forever) {
             muteChat(-1);
@@ -211,7 +444,7 @@ public class ChatDetailActivity extends AppCompatActivity {
     }
 
     private void showClearHistoryDialog() {
-        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+        new MaterialAlertDialogBuilder(this)
                 .setTitle("Clear History")
                 .setMessage("Are you sure you want to delete all messages in this chat?")
                 .setPositiveButton("Clear", (dialog, which) -> {
@@ -223,7 +456,7 @@ public class ChatDetailActivity extends AppCompatActivity {
     }
 
     private void showDeleteChatDialog() {
-        new com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+        new MaterialAlertDialogBuilder(this)
                 .setTitle("Delete Chat")
                 .setMessage("Are you sure you want to delete this chat? This action cannot be undone.")
                 .setPositiveButton("Delete", (dialog, which) -> finish())
@@ -278,7 +511,10 @@ public class ChatDetailActivity extends AppCompatActivity {
 
     private void updateList(RecyclerView rv, String type, BottomSheetDialog dialog, View dialogView) {
         List<String> data = mediaHelper.fetchMedia(type);
+        renderMediaList(rv, data, type, dialog, dialogView);
+    }
 
+    private void renderMediaList(RecyclerView rv, List<String> data, String type, BottomSheetDialog dialog, View dialogView) {
         android.widget.Button btnSend = dialogView.findViewById(R.id.buttonSendMedia);
         btnSend.setVisibility(View.GONE);
 
@@ -291,8 +527,10 @@ public class ChatDetailActivity extends AppCompatActivity {
             }
 
             btnSend.setOnClickListener(v -> {
-                for (String path : selectedPaths) {
-                    sendMediaMessage(path, type);
+                if (selectedPaths.size() > 1) {
+                    sendCollageMessage(selectedPaths);
+                } else {
+                    sendMediaMessage(selectedPaths.get(0), type);
                 }
                 dialog.dismiss();
             });
@@ -324,45 +562,22 @@ public class ChatDetailActivity extends AppCompatActivity {
         scrollToBottom();
     }
 
-    private void showContextMenu(Message message, int position) {
-        RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
-        if (layoutManager == null) return;
+    private void showEditMessageDialog(Message message, int position) {
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_edit_message, null);
+        TextInputEditText editInput = dialogView.findViewById(R.id.editTextEditMessage);
+        editInput.setText(message.getText());
 
-        View view = layoutManager.findViewByPosition(position);
-        if (view == null) return;
-
-        PopupMenu popup = new PopupMenu(this, view);
-
-        boolean isMedia = !Message.TYPE_TEXT.equals(message.getType());
-
-        if (isMedia) {
-            popup.getMenu().add(0, 0, 0, "Save to Gallery");
-            popup.getMenu().add(0, 1, 1, "Share");
-        } else {
-            popup.getMenu().add(0, 3, 0, "Copy Text");
-        }
-
-        popup.getMenu().add(0, 2, 2, "Delete for me");
-
-        popup.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case 0:
-                    saveMedia(message.getUrl());
-                    return true;
-                case 1:
-                    shareMedia(message.getUrl());
-                    return true;
-                case 2:
-                    deleteMessage(position);
-                    return true;
-                case 3:
-                    copyToClipboard(message.getText());
-                    return true;
-                default:
-                    return false;
-            }
-        });
-        popup.show();
+        new MaterialAlertDialogBuilder(this)
+                .setView(dialogView)
+                .setPositiveButton("Save", (dialog, which) -> {
+                    String newText = Objects.requireNonNull(editInput.getText()).toString().trim();
+                    if (!newText.isEmpty()) {
+                        message.setText(newText);
+                        adapter.notifyItemChanged(position);
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     private void saveMedia(String path) {
@@ -467,5 +682,22 @@ public class ChatDetailActivity extends AppCompatActivity {
         );
 
         addMessage(mediaMessage);
+    }
+
+    private void sendCollageMessage(List<String> filePaths) {
+        String messageId = String.valueOf(System.currentTimeMillis());
+        long currentTime = System.currentTimeMillis();
+
+        Message collageMessage = new Message(
+                messageId,
+                "me",
+                null,
+                currentTime,
+                Message.TYPE_COLLAGE,
+                null,
+                filePaths
+        );
+
+        addMessage(collageMessage);
     }
 }

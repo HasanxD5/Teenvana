@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="by.hasanxd5.teenvana.MainFragments$ContactsFragment">
+    tools:context="by.hasanxd5.teenvana.MainFragmentsInsets$ContactsFragment">
 
 
     <TextView
@@ -22,12 +22,14 @@
         android:textStyle="bold" />
 
     <LinearLayout
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
         android:orientation="vertical"
         android:paddingHorizontal="24dp"
-        android:paddingVertical="48dp">
+        android:paddingVertical="48dp"
+        android:baselineAligned="false">
 
         <ImageView
             android:layout_width="64dp"
@@ -42,7 +44,7 @@
             android:layout_marginTop="16dp"
             android:fontFamily="sans-serif-medium"
             android:gravity="center"
-            android:text="No contacts yet"
+            android:text="@string/contacts_no_contacts"
             android:textColor="?attr/colorOnSurface"
             android:textSize="20sp" />
 
@@ -51,7 +53,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:gravity="center"
-            android:text="Your contact list is empty. Invite your friends to download the app and start chatting!"
+            android:text="@string/contacts_empty_desc"
             android:textColor="?attr/colorOnSurfaceVariant"
             android:textSize="14sp" />
 
@@ -61,7 +63,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="Invite Friends"
+            android:text="@string/contacts_invite_friends"
             app:icon="@android:drawable/ic_menu_share"
             app:iconTint="?attr/colorOnPrimary" />
 

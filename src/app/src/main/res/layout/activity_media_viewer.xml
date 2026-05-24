@@ -9,20 +9,10 @@
     android:background="@android:color/black"
     android:fitsSystemWindows="false">
 
-    <io.getstream.photoview.PhotoView
-        android:id="@+id/full_image_view"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/media_view_pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone" />
-
-    <androidx.media3.ui.PlayerView
-        android:id="@+id/player_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-        app:use_controller="true"
-        app:show_timeout="3000"
-        app:surface_type="surface_view" />
+        android:layout_height="match_parent" />
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/controls_top"
@@ -42,6 +32,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+                <TextView
+                    android:id="@+id/toolbar_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="1 of 5" />
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_more"
                     style="@style/Widget.Material3.Button.IconButton"
@@ -59,14 +61,5 @@
 
         </com.google.android.material.appbar.MaterialToolbar>
     </com.google.android.material.appbar.AppBarLayout>
-
-    <com.google.android.material.progressindicator.CircularProgressIndicator
-        android:id="@+id/loading_progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:indeterminate="true"
-        app:indicatorColor="@android:color/white"
-        android:visibility="gone" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
