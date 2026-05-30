@@ -2,8 +2,6 @@
 
 > [!IMPORTANT]
 > The repository of this app is archived now, since the reason while missing data center and plans by development!
-> Thanks for understanding!
-
 Teenvana is a  messenger application tailored for teens and young adults, focusing on speed, simplicity.
 
 ## 🛠 Tech Stack
